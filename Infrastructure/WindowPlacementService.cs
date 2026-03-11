@@ -15,7 +15,7 @@ namespace TrayApp.Infrastructure
 
         private record PlacementRecord(double Left, double Top, double Width, double Height, string State);
 
-        private const double DefaultWidth  = 1000;
+        private const double DefaultWidth  = 500;
         private const double DefaultHeight = 720;
         private const double MinDimension  = 200;
 

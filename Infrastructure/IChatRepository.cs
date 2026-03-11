@@ -10,5 +10,6 @@ namespace TrayApp.Infrastructure
         Task<ChatSession[]?> LoadAllAsync();
         Task<ChatSession?> LoadLatestAsync();
         Task DeleteSessionAsync(Guid id);
+        Task DeleteAllAsync();
     }
 }

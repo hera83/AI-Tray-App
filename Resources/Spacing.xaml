@@ -6,7 +6,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
 
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Window.Main.Height">720</sys:Double>
-  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Window.Main.Width">1000</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Window.Main.Width">500</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Window.Settings.Height">620</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Window.Settings.Width">520</sys:Double>
 
@@ -40,7 +40,7 @@
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.StatusIndicator">12</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.TypingDot">8</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Control.DropdownAffordanceWidth">34</sys:Double>
-  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Control.ScrollBarThickness">10</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Control.ScrollBarThickness">8</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.CheckBox.Box">16</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.CheckBox.Column">18</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.CheckBox.Gap">8</sys:Double>

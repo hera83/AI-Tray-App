@@ -11,11 +11,15 @@ namespace TrayApp.Services
         private readonly Window _mainWindow;
         private bool _isExitRequested;
         private bool _disposed;
+        private DateTime _lastTrayInteractionUtc;
+        private DateTime _lastToggleUtc;
+        private DateTime _lastAutoHideUtc;
 
         public event Action? ShowRequested;
         public event Action? NewChatRequested;
         public event Action? SettingsRequested;
         public event Action? ExitRequested;
+        public event Action? MainHidden;
 
         public TrayService(Window mainWindow)
         {
@@ -56,7 +60,8 @@ namespace TrayApp.Services
 
             _notifyIcon.ContextMenuStrip = menu;
             _notifyIcon.Visible = true;
-            _notifyIcon.DoubleClick += (_, __) => ShowMain();
+            _notifyIcon.MouseDown += OnNotifyIconMouseDown;
+            _notifyIcon.MouseClick += OnNotifyIconMouseClick;
 
             // clicking a balloon tip brings the window to front
             _notifyIcon.BalloonTipClicked += (_, __) =>
@@ -66,6 +71,7 @@ namespace TrayApp.Services
             };
 
             _mainWindow.Closing += MainWindow_Closing;
+            _mainWindow.Deactivated += MainWindow_Deactivated;
             System.Windows.Application.Current.Exit += (_, __) => Dispose();
         }
 
@@ -84,7 +90,114 @@ namespace TrayApp.Services
         {
             if (_isExitRequested) return;
             e.Cancel = true;
-            _mainWindow.Dispatcher.Invoke(() => _mainWindow.Hide());
+            HideMain();
+        }
+
+        private async void MainWindow_Deactivated(object? sender, EventArgs e)
+        {
+            if (_isExitRequested || _disposed)
+                return;
+
+            await System.Threading.Tasks.Task.Delay(180);
+
+            if (_isExitRequested || _disposed)
+                return;
+
+            _mainWindow.Dispatcher.Invoke(() =>
+            {
+                if (!_mainWindow.IsVisible)
+                    return;
+
+                if (_mainWindow.IsActive)
+                    return;
+
+                if (HasVisibleOwnedWindow())
+                    return;
+
+                if (IsTrayInteractionRecent())
+                    return;
+
+                HideMain(markAsAutoHide: true);
+            });
+        }
+
+        private void OnNotifyIconMouseDown(object? sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
+                _lastTrayInteractionUtc = DateTime.UtcNow;
+        }
+
+        private void OnNotifyIconMouseClick(object? sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+                return;
+
+            var now = DateTime.UtcNow;
+            if ((now - _lastAutoHideUtc) < TimeSpan.FromMilliseconds(200))
+                return;
+
+            if ((now - _lastToggleUtc) < TimeSpan.FromMilliseconds(300))
+                return;
+
+            _lastTrayInteractionUtc = now;
+            _lastToggleUtc = now;
+            ToggleMain();
+        }
+
+        private void ToggleMain()
+        {
+            _mainWindow.Dispatcher.Invoke(() =>
+            {
+                var isOpen = _mainWindow.IsVisible && _mainWindow.WindowState != WindowState.Minimized;
+                if (isOpen)
+                {
+                    _mainWindow.WindowState = WindowState.Minimized;
+                    HideMain();
+                    return;
+                }
+
+                ShowRequested?.Invoke();
+                ShowMain();
+            });
+        }
+
+        private void HideMain(bool markAsAutoHide = false)
+        {
+            void HideAction()
+            {
+                if (!_mainWindow.IsVisible)
+                    return;
+
+                if (markAsAutoHide)
+                    _lastAutoHideUtc = DateTime.UtcNow;
+
+                _mainWindow.Hide();
+                MainHidden?.Invoke();
+            }
+
+            if (_mainWindow.Dispatcher.CheckAccess())
+            {
+                HideAction();
+                return;
+            }
+
+            _mainWindow.Dispatcher.Invoke(HideAction);
+        }
+
+        private bool IsTrayInteractionRecent()
+        {
+            return (DateTime.UtcNow - _lastTrayInteractionUtc) < TimeSpan.FromMilliseconds(600);
+        }
+
+        private bool HasVisibleOwnedWindow()
+        {
+            foreach (Window ownedWindow in _mainWindow.OwnedWindows)
+            {
+                if (ownedWindow.IsVisible)
+                    return true;
+            }
+
+            return false;
         }
 
         private void ShowMain()
@@ -107,6 +220,11 @@ namespace TrayApp.Services
         {
             if (_disposed) return;
             _disposed = true;
+
+            _mainWindow.Closing -= MainWindow_Closing;
+            _mainWindow.Deactivated -= MainWindow_Deactivated;
+            _notifyIcon.MouseDown -= OnNotifyIconMouseDown;
+            _notifyIcon.MouseClick -= OnNotifyIconMouseClick;
 
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();

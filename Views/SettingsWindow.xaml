@@ -22,16 +22,21 @@
                 <TextBlock Text="AI Gateway" Style="{StaticResource SectionHeaderTextStyle}"/>
                 <Separator Style="{StaticResource PanelSeparatorStyle}"/>
 
-                <TextBlock Text="Base URL" Style="{StaticResource FieldLabelTextStyle}"/>
+                <TextBlock Text="Gateway URL" Style="{StaticResource FieldLabelTextStyle}"/>
                 <TextBox Text="{Binding AiEndpoint, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource InputTextBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+                <TextBlock Text="Du kan indsætte hele endpointet eller bare gatewayens base URL. Hvis du kun angiver hosten, bruger appen automatisk chat-routen for Ollama-gatewayen."
+                           Style="{StaticResource HelperTextStyle}"
+                           Margin="{StaticResource Thickness.Form.HelperBottom}"/>
 
                 <TextBlock Text="API Key" Style="{StaticResource FieldLabelTextStyle}"/>
                 <PasswordBox Margin="{StaticResource Thickness.Form.HelperTop}"
                              Style="{StaticResource InputPasswordBoxStyle}"
                              behaviors:PasswordBoxAssistant.BindPassword="True"
                              behaviors:PasswordBoxAssistant.BoundPassword="{Binding ApiKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Gemt lokalt — vis aldrig i logfiler." Style="{StaticResource HelperTextStyle}" Margin="{StaticResource Thickness.Form.HelperBottom}"/>
+                <TextBlock Text="Gemt lokalt og sendt som den auth-header din gateway forventer. Vis aldrig nøglen i logfiler eller screenshots."
+                           Style="{StaticResource HelperTextStyle}"
+                           Margin="{StaticResource Thickness.Form.HelperBottom}"/>
 
                 <TextBlock Text="Model" Style="{StaticResource FieldLabelTextStyle}"/>
                 <TextBox Text="{Binding Model, UpdateSourceTrigger=PropertyChanged}"
@@ -64,6 +69,20 @@
                 <CheckBox Content="Brug streaming (server-sent events)"
                           IsChecked="{Binding UseStreaming}"
                           Style="{StaticResource ModernCheckBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                <!-- \u2550\u2550 Data \u2550\u2550 -->
+                <TextBlock Text="Data" Style="{StaticResource SectionHeaderTextStyle}"/>
+                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+
+                <TextBlock Text="Slet alle samtaler" Style="{StaticResource FieldLabelTextStyle}"/>
+                <Button Content="Slet alle samtaler"
+                        Command="{Binding DeleteAllChatsCommand}"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        HorizontalAlignment="Left"
+                        Margin="{StaticResource Thickness.Form.FieldBottom}" />
+                <TextBlock Text="Sletter al chat-historik permanent. Appen starter med en ny tom samtale."
+                           Style="{StaticResource HelperTextStyle}"
+                           Margin="{StaticResource Thickness.Form.HelperBottom}"/>
 
                 <!-- ══ App ══ -->
                 <TextBlock Text="App" Style="{StaticResource SectionHeaderTextStyle}"/>

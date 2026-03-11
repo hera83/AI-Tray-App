@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,10 +22,12 @@ namespace TrayApp.ViewModels
         private bool _isInitialized;
         private bool _disposed;
         private bool _isSending;
+        private bool _resetToFreshChatOnIdle;
         private int _sendGate;
         private CancellationTokenSource? _generationCts;
 
         public ObservableCollection<ChatMessage> Messages { get; } = new();
+        public ObservableCollection<ChatSession> ChatSessions { get; } = new();
 
         private bool _isUserNearBottom = true;
         public bool IsUserNearBottom
@@ -43,7 +46,7 @@ namespace TrayApp.ViewModels
         public ChatSession? ActiveSession
         {
             get => _activeSession;
-            private set
+            set
             {
                 if (SetProperty(ref _activeSession, value))
                 {
@@ -54,11 +57,27 @@ namespace TrayApp.ViewModels
                             Messages.Add(message);
                     }
 
+                    ShowNewMessages = false;
+                    ScrollToBottomRequest++;
+
                     OnPropertyChanged(nameof(ShowEmptyState));
                     RaiseCommandStateChanged();
                 }
             }
         }
+
+        private bool _isHistoryPaneExpanded;
+        public bool IsHistoryPaneExpanded
+        {
+            get => _isHistoryPaneExpanded;
+            private set
+            {
+                if (SetProperty(ref _isHistoryPaneExpanded, value))
+                    OnPropertyChanged(nameof(HistoryPaneToggleText));
+            }
+        }
+
+        public string HistoryPaneToggleText => IsHistoryPaneExpanded ? "Skjul historik" : "Historik";
 
         private string _inputText = string.Empty;
         public string InputText
@@ -67,7 +86,10 @@ namespace TrayApp.ViewModels
             set
             {
                 if (SetProperty(ref _inputText, value))
+                {
+                    EnsureDraftSessionForInput();
                     RaiseCommandStateChanged();
+                }
             }
         }
 
@@ -81,6 +103,7 @@ namespace TrayApp.ViewModels
                 {
                     OnPropertyChanged(nameof(IsInputEnabled));
                     RaiseCommandStateChanged();
+                    TryApplyPendingResetForNextOpen();
                 }
             }
         }
@@ -96,6 +119,7 @@ namespace TrayApp.ViewModels
                     OnPropertyChanged(nameof(IsInputEnabled));
                     OnPropertyChanged(nameof(ShowEmptyState));
                     RaiseCommandStateChanged();
+                    TryApplyPendingResetForNextOpen();
                 }
             }
         }
@@ -133,13 +157,15 @@ namespace TrayApp.ViewModels
             ? "Skriv din besked nedenfor for at begynde."
             : "Åbn Indstillinger og angiv endpoint og eventuel API key for at bruge appen.";
         public bool IsEndpointConfigured => !string.IsNullOrWhiteSpace(_settings.Settings.AiEndpoint);
-        public bool CanSend => !IsLoading && !IsInitializing && ActiveSession != null && IsEndpointConfigured && !string.IsNullOrWhiteSpace(InputText);
+        public bool CanSend => !IsLoading && !IsInitializing && IsEndpointConfigured && !string.IsNullOrWhiteSpace(InputText);
 
         public ICommand SendCommand { get; }
         public ICommand OpenSettingsCommand { get; }
         public ICommand NewChatCommand { get; }
         public ICommand GoToLatestCommand { get; }
         public ICommand StopGenerationCommand { get; }
+        public ICommand ToggleHistoryPaneCommand { get; }
+        public ICommand DeleteSessionCommand { get; }
 
         public event Action<string>? ResponseCompleted;
         public event Action? SettingsRequested;
@@ -157,6 +183,8 @@ namespace TrayApp.ViewModels
             NewChatCommand = new RelayCommand(async _ => await NewChatAsync());
             StopGenerationCommand = new RelayCommand(_ => CancelGeneration(), _ => _generationCts != null || IsLoading);
             GoToLatestCommand = new RelayCommand(_ => GoToLatest());
+            ToggleHistoryPaneCommand = new RelayCommand(_ => IsHistoryPaneExpanded = !IsHistoryPaneExpanded);
+            DeleteSessionCommand = new RelayCommand(async p => { if (p is ChatSession s) await DeleteSessionAsync(s); });
         }
 
         public async Task InitializeAsync()
@@ -170,15 +198,22 @@ namespace TrayApp.ViewModels
 
             try
             {
-                var latest = await _repo.LoadLatestAsync();
-                var session = latest ?? CreateSession("Hej! Jeg er din AI-assistent. Hvordan kan jeg hjælpe dig i dag?");
+                var loadedSessions = await _repo.LoadAllAsync() ?? Array.Empty<ChatSession>();
+                var orderedSessions = loadedSessions
+                    .OrderByDescending(session => session.UpdatedAt)
+                    .ToList();
 
-                if (latest == null)
-                    await _repo.SaveSessionAsync(session);
+                if (orderedSessions.Count == 0)
+                {
+                }
 
                 await RunOnUiThreadAsync(() =>
                 {
-                    ActiveSession = session;
+                    ChatSessions.Clear();
+                    foreach (var session in orderedSessions)
+                        ChatSessions.Add(session);
+
+                    ActiveSession = ChatSessions.FirstOrDefault();
                     OnPropertyChanged(nameof(ShowEmptyState));
                 });
 
@@ -195,6 +230,9 @@ namespace TrayApp.ViewModels
 
                 await RunOnUiThreadAsync(() =>
                 {
+                    ChatSessions.Clear();
+                    ChatSessions.Add(fallback);
+
                     ErrorMessage = $"Kunne ikke indlæse chats: {ex.Message}";
                     ErrorHint = "Appen startede med en midlertidig tom lokal session. Se logfilen for detaljer.";
                     ActiveSession = fallback;
@@ -225,13 +263,93 @@ namespace TrayApp.ViewModels
                 SetStatus(ChatUiStatus.Error, "Konfiguration mangler", "Angiv AI endpoint i Indstillinger for at sende beskeder.");
         }
 
-        private async Task NewChatAsync()
+        public void ResetForNextOpen()
+        {
+            if (_disposed)
+                return;
+
+            if (IsLoading || IsInitializing)
+            {
+                _resetToFreshChatOnIdle = true;
+                return;
+            }
+
+            _resetToFreshChatOnIdle = false;
+            _ = NewChatAsync();
+        }
+
+        private Task NewChatAsync()
         {
             ClearError();
-            var session = CreateSession("Ny chat startet.");
-            ActiveSession = session;
-            await SaveActiveSessionSafeAsync();
-            SetStatus(ChatUiStatus.Ready, "Klar", "Ny chat er oprettet.");
+            InputText = string.Empty;
+            // Already on a blank slate
+            if (ActiveSession == null || ActiveSession.Messages.Count == 0)
+            {
+                SetStatus(ChatUiStatus.Ready, "Klar", "Klar til ny samtale.");
+                return Task.CompletedTask;
+            }
+            // Discard context — session is created lazily on first send
+            ActiveSession = null;
+            SetStatus(ChatUiStatus.Ready, "Klar", "Klar til ny samtale.");
+            return Task.CompletedTask;
+        }
+
+        private void TryApplyPendingResetForNextOpen()
+        {
+            if (!_resetToFreshChatOnIdle || IsLoading || IsInitializing)
+                return;
+
+            _resetToFreshChatOnIdle = false;
+            _ = NewChatAsync();
+        }
+
+        private void EnsureDraftSessionForInput()
+        {
+            if (_disposed || IsInitializing || IsLoading)
+                return;
+
+            if (ActiveSession != null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(_inputText))
+                return;
+
+            var draftSession = CreateEmptySession();
+            ChatSessions.Insert(0, draftSession);
+            ActiveSession = draftSession;
+            _ = SaveActiveSessionSafeAsync();
+        }
+
+        private async Task DeleteSessionAsync(ChatSession session)
+        {
+            try
+            {
+                await _repo.DeleteSessionAsync(session.Id);
+                ChatSessions.Remove(session);
+
+                if (ActiveSession == session)
+                {
+                    ActiveSession = ChatSessions.Count > 0 ? ChatSessions[0] : null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Kunne ikke slette samtale.", ex);
+            }
+        }
+
+        public async Task DeleteAllSessionsAsync()
+        {
+            try
+            {
+                await _repo.DeleteAllAsync();
+                ChatSessions.Clear();
+                ActiveSession = null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Kunne ikke slette alle samtaler.", ex);
+            }
         }
 
         private void GoToLatest()
@@ -262,11 +380,19 @@ namespace TrayApp.ViewModels
 
         private async Task SendAsync()
         {
-            if (_disposed || string.IsNullOrWhiteSpace(InputText) || ActiveSession == null || IsInitializing)
+            if (_disposed || string.IsNullOrWhiteSpace(InputText) || IsInitializing)
                 return;
 
             if (Interlocked.Exchange(ref _sendGate, 1) == 1)
                 return;
+
+            // Lazy session creation
+            if (ActiveSession == null)
+            {
+                var freshSession = CreateEmptySession();
+                ChatSessions.Insert(0, freshSession);
+                ActiveSession = freshSession;
+            }
 
             var prompt = InputText.Trim();
             var wasCancelled = false;
@@ -364,14 +490,19 @@ namespace TrayApp.ViewModels
             }
         }
 
-        private ChatSession CreateSession(string initialAssistantMessage)
+        private ChatSession CreateEmptySession()
         {
-            var session = new ChatSession
+            return new ChatSession
             {
                 Title = "Chat " + DateTime.Now.ToLocalTime().ToString("g"),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
+        }
+
+        private ChatSession CreateSession(string initialAssistantMessage)
+        {
+            var session = CreateEmptySession();
 
             session.Messages.Add(new ChatMessage
             {
@@ -393,6 +524,7 @@ namespace TrayApp.ViewModels
             {
                 ActiveSession.UpdatedAt = DateTime.UtcNow;
                 await _repo.SaveSessionAsync(ActiveSession);
+                MoveSessionToTop(ActiveSession);
             }
             catch (Exception ex)
             {
@@ -449,6 +581,19 @@ namespace TrayApp.ViewModels
         {
             ErrorMessage = null;
             ErrorHint = null;
+        }
+
+        private void MoveSessionToTop(ChatSession session)
+        {
+            var currentIndex = ChatSessions.IndexOf(session);
+            if (currentIndex > 0)
+            {
+                ChatSessions.Move(currentIndex, 0);
+                return;
+            }
+
+            if (currentIndex < 0)
+                ChatSessions.Insert(0, session);
         }
 
         private static Task RunOnUiThreadAsync(Action action)

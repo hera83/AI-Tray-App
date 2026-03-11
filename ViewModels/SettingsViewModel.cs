@@ -72,6 +72,10 @@ namespace TrayApp.ViewModels
         // --- Commands ---
         public ICommand SaveCommand   { get; }
         public ICommand CancelCommand { get; }
+        public ICommand DeleteAllChatsCommand { get; }
+
+        /// <summary>Raised when the user confirms deleting all chat sessions.</summary>
+        public event Action? AllChatsDeleteRequested;
 
         /// <summary>Raised when the window should close (save or cancel).</summary>
         public event Action<bool>? CloseRequested; // true = saved
@@ -95,6 +99,16 @@ namespace TrayApp.ViewModels
 
             SaveCommand   = new RelayCommand(_ => Save());
             CancelCommand = new RelayCommand(_ => CloseRequested?.Invoke(false));
+            DeleteAllChatsCommand = new RelayCommand(_ =>
+            {
+                var result = System.Windows.MessageBox.Show(
+                    "Er du sikker på, at du vil slette alle samtaler?\nDette kan ikke fortrydes.",
+                    "Slet alle samtaler",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning);
+                if (result == System.Windows.MessageBoxResult.Yes)
+                    AllChatsDeleteRequested?.Invoke();
+            });
         }
 
         private void Save()

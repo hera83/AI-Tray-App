@@ -27,4 +27,18 @@ namespace TrayApp.Services
     {
         public AiMessage? Message { get; set; }
     }
+
+    public class OllamaChatRequest
+    {
+        public string? Model { get; set; }
+        public List<AiMessage>? Messages { get; set; }
+        public bool? Stream { get; set; }
+    }
+
+    public class OllamaChatResponse
+    {
+        public string? Model { get; set; }
+        public AiMessage? Message { get; set; }
+        public bool Done { get; set; }
+    }
 }

@@ -10,7 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\app.ico" />
+    <Content Include="Assets\app.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Assets\app.ico</TargetPath>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

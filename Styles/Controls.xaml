@@ -83,6 +83,96 @@
 
   <Style TargetType="ToggleButton" BasedOn="{StaticResource BaseToggleButtonStyle}" />
 
+  <Style x:Key="SlimScrollBarThumbStyle" TargetType="Thumb">
+    <Setter Property="Background" Value="{DynamicResource Brush.Theme.Border}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Thumb">
+          <Border x:Name="ThumbBody"
+                  Margin="2"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="{StaticResource CornerRadius.Small}"
+                  Opacity="0.5" />
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="ThumbBody" Property="Background" Value="{DynamicResource Brush.Theme.TextSecondary}" />
+              <Setter TargetName="ThumbBody" Property="Opacity" Value="0.78" />
+            </Trigger>
+            <Trigger Property="IsDragging" Value="True">
+              <Setter TargetName="ThumbBody" Property="Background" Value="{DynamicResource Brush.Theme.Accent}" />
+              <Setter TargetName="ThumbBody" Property="Opacity" Value="0.92" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <ControlTemplate x:Key="VerticalScrollBarTemplate" TargetType="ScrollBar">
+    <Border Background="Transparent"
+            Width="{TemplateBinding Width}">
+      <Track x:Name="PART_Track"
+             IsDirectionReversed="True"
+             Focusable="False">
+        <Track.DecreaseRepeatButton>
+          <RepeatButton Command="ScrollBar.PageUpCommand"
+                        Focusable="False"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Opacity="0" />
+        </Track.DecreaseRepeatButton>
+        <Track.Thumb>
+          <Thumb Style="{StaticResource SlimScrollBarThumbStyle}" />
+        </Track.Thumb>
+        <Track.IncreaseRepeatButton>
+          <RepeatButton Command="ScrollBar.PageDownCommand"
+                        Focusable="False"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Opacity="0" />
+        </Track.IncreaseRepeatButton>
+      </Track>
+    </Border>
+  </ControlTemplate>
+
+  <ControlTemplate x:Key="HorizontalScrollBarTemplate" TargetType="ScrollBar">
+    <Border Background="Transparent"
+            Height="{TemplateBinding Height}">
+      <Track x:Name="PART_Track"
+             Focusable="False">
+        <Track.DecreaseRepeatButton>
+          <RepeatButton Command="ScrollBar.PageLeftCommand"
+                        Focusable="False"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Opacity="0" />
+        </Track.DecreaseRepeatButton>
+        <Track.Thumb>
+          <Thumb Style="{StaticResource SlimScrollBarThumbStyle}" />
+        </Track.Thumb>
+        <Track.IncreaseRepeatButton>
+          <RepeatButton Command="ScrollBar.PageRightCommand"
+                        Focusable="False"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Opacity="0" />
+        </Track.IncreaseRepeatButton>
+      </Track>
+    </Border>
+  </ControlTemplate>
+
+  <Style TargetType="ScrollBar">
+    <Setter Property="Width" Value="{StaticResource Size.Control.ScrollBarThickness}" />
+    <Setter Property="Height" Value="{StaticResource Size.Control.ScrollBarThickness}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template" Value="{StaticResource VerticalScrollBarTemplate}" />
+    <Style.Triggers>
+      <Trigger Property="Orientation" Value="Horizontal">
+        <Setter Property="Template" Value="{StaticResource HorizontalScrollBarTemplate}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
   <Style x:Key="BaseTextBoxStyle" TargetType="TextBox">
     <Setter Property="Background" Value="{DynamicResource Brush.Theme.InputBackground}"/>
     <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.InputForeground}"/>

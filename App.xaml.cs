@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using TrayApp.Services;
 using TrayApp.ViewModels;
 using TrayApp.Infrastructure;
@@ -37,6 +38,7 @@ namespace TrayApp
                 _chatServiceDisposable = chatService as IDisposable;
 
                 var main = new Views.MainWindow();
+                ApplyAppIcon(main);
                 MainWindow = main;
 
                 var vm = new ViewModels.MainWindowViewModel(chatService, chatRepo, settingsService, _logger);
@@ -51,14 +53,14 @@ namespace TrayApp
 
                 _trayService = new TrayService(main);
 
-                _trayService.NewChatRequested += () => main.Dispatcher.Invoke(() => vm.NewChatCommand.Execute(null));
-                _trayService.SettingsRequested += () => main.Dispatcher.Invoke(() => ShowSettingsWindow(main, settingsService, _themeManager, _logger));
-                _trayService.ShowRequested += () => main.Dispatcher.Invoke(() =>
+                _trayService.NewChatRequested += () => main.Dispatcher.Invoke(() =>
                 {
-                    main.Show();
-                    main.WindowState = WindowState.Normal;
-                    main.Activate();
+                    vm.NewChatCommand.Execute(null);
+                    main.ActivateAndFocusInput();
                 });
+                _trayService.MainHidden += () => main.Dispatcher.Invoke(() => vm.ResetForNextOpen());
+                _trayService.SettingsRequested += () => main.Dispatcher.Invoke(() => ShowSettingsWindow(main, settingsService, _themeManager, _logger));
+                _trayService.ShowRequested += () => main.Dispatcher.Invoke(() => main.ActivateAndFocusInput());
 
                 vm.SettingsRequested += () => main.Dispatcher.Invoke(() => ShowSettingsWindow(main, settingsService, _themeManager, _logger));
                 vm.ResponseCompleted += responseText =>
@@ -138,8 +140,12 @@ namespace TrayApp
         {
             var window = new Views.SettingsWindow
             {
-                Owner = owner
+                Owner = owner,
+                Icon = owner.Icon
             };
+
+            if (window.Icon == null)
+                ApplyAppIcon(window);
 
             var vm = new SettingsViewModel(settingsService, themeManager, logger);
             vm.CloseRequested += saved =>
@@ -152,8 +158,29 @@ namespace TrayApp
 
                 window.Close();
             };
+            vm.AllChatsDeleteRequested += async () =>
+            {
+                if (owner.DataContext is MainWindowViewModel mainVm)
+                    await mainVm.DeleteAllSessionsAsync();
+            };
             window.DataContext = vm;
             window.ShowDialog();
+        }
+
+        private static void ApplyAppIcon(Window window)
+        {
+            var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "app.ico");
+            if (!File.Exists(iconPath))
+                return;
+
+            try
+            {
+                window.Icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
+            }
+            catch
+            {
+                // best-effort icon assignment
+            }
         }
     }
 }

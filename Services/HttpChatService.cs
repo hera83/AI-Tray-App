@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
@@ -13,6 +14,12 @@ namespace TrayApp.Services
 {
     public class HttpChatService : IChatService, IDisposable
     {
+        private enum EndpointProtocol
+        {
+            OpenAiCompatible,
+            OllamaChat
+        }
+
         private readonly HttpClient _http;
         private readonly ISettingsService _settings;
         private readonly IAppLogger _logger;
@@ -30,13 +37,13 @@ namespace TrayApp.Services
 
         public async IAsyncEnumerable<string> StreamResponseAsync(string prompt, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var s = _settings.Settings;
-            if (string.IsNullOrWhiteSpace(s.AiEndpoint))
+            var settings = _settings.Settings;
+            if (string.IsNullOrWhiteSpace(settings.AiEndpoint))
                 throw new ChatServiceException(
                     ChatServiceErrorKind.Configuration,
                     "AI endpoint er ikke konfigureret. Åbn Indstillinger og angiv en base URL.");
 
-            if (!Uri.TryCreate(s.AiEndpoint, UriKind.Absolute, out var endpointUri))
+            if (!Uri.TryCreate(settings.AiEndpoint, UriKind.Absolute, out var endpointUri))
                 throw new ChatServiceException(
                     ChatServiceErrorKind.Configuration,
                     "AI endpoint er ugyldigt. Kontrollér URL'en i Indstillinger.");
@@ -46,40 +53,92 @@ namespace TrayApp.Services
                     ChatServiceErrorKind.Connection,
                     "Ingen netværksforbindelse fundet. Kontrollér internetforbindelsen og prøv igen.");
 
-            var req = new AiChatRequest
+            var protocol = DetectEndpointProtocol(endpointUri);
+            var requestUri = ResolveRequestUri(endpointUri, protocol);
+            var messages = BuildMessages(prompt, settings.SystemPrompt);
+            var payload = protocol == EndpointProtocol.OllamaChat
+                ? SerializeOllamaRequest(settings, messages)
+                : SerializeOpenAiRequest(settings, messages);
+
+            using var content = new StringContent(payload, Encoding.UTF8, "application/json");
+            using var request = new HttpRequestMessage(HttpMethod.Post, requestUri) { Content = content };
+            ApplyAuthentication(request, settings.ApiKey, protocol);
+
+            _logger.LogInfo($"Sender AI-request til {requestUri.Host}{requestUri.AbsolutePath} (streaming={settings.UseStreaming}, protocol={protocol}).");
+            using var response = await SendAsync(request, settings.UseStreaming, cancellationToken).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
             {
-                Model       = s.Model,
-                Temperature = s.Temperature,
-                Stream      = s.UseStreaming,
-                Messages    = new List<AiMessage>()
-            };
-
-            // prepend system prompt if set
-            if (!string.IsNullOrWhiteSpace(s.SystemPrompt))
-                req.Messages.Add(new AiMessage { Role = "system", Content = s.SystemPrompt });
-
-            req.Messages.Add(new AiMessage { Role = "user", Content = prompt });
-
-            var json = JsonSerializer.Serialize(req, _jsonOptions);
-            using var content = new StringContent(json, Encoding.UTF8, "application/json");
-            using var request = new HttpRequestMessage(HttpMethod.Post, endpointUri) { Content = content };
-
-            if (!string.IsNullOrEmpty(s.ApiKey))
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", s.ApiKey);
-
-            _logger.LogInfo($"Sender AI-request til {endpointUri.Host} (streaming={s.UseStreaming}).");
-            using var res = await SendAsync(request, s.UseStreaming, cancellationToken).ConfigureAwait(false);
-
-            if (!res.IsSuccessStatusCode)
-            {
-                var body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
-                _logger.LogWarning($"AI endpoint returnerede {(int)res.StatusCode} {res.ReasonPhrase}.");
-                throw CreateHttpFailure((int)res.StatusCode, body);
+                var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                _logger.LogWarning($"AI endpoint returnerede {(int)response.StatusCode} {response.ReasonPhrase}.");
+                throw CreateHttpFailure((int)response.StatusCode, body);
             }
 
-            if (!s.UseStreaming)
+            if (protocol == EndpointProtocol.OllamaChat)
             {
-                var respJson = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
+                await foreach (var chunk in ReadOllamaResponseAsync(response, settings.UseStreaming, cancellationToken))
+                    yield return chunk;
+
+                yield break;
+            }
+
+            await foreach (var chunk in ReadOpenAiResponseAsync(response, settings.UseStreaming, cancellationToken))
+                yield return chunk;
+        }
+
+        public void Dispose()
+        {
+            _http.Dispose();
+        }
+
+        private static List<AiMessage> BuildMessages(string prompt, string? systemPrompt)
+        {
+            var messages = new List<AiMessage>();
+
+            if (!string.IsNullOrWhiteSpace(systemPrompt))
+                messages.Add(new AiMessage { Role = "system", Content = systemPrompt });
+
+            messages.Add(new AiMessage { Role = "user", Content = prompt });
+            return messages;
+        }
+
+        private string SerializeOpenAiRequest(AppSettings settings, List<AiMessage> messages)
+        {
+            return JsonSerializer.Serialize(new AiChatRequest
+            {
+                Model = settings.Model,
+                Temperature = settings.Temperature,
+                Stream = settings.UseStreaming,
+                Messages = messages
+            }, _jsonOptions);
+        }
+
+        private string SerializeOllamaRequest(AppSettings settings, List<AiMessage> messages)
+        {
+            return JsonSerializer.Serialize(new OllamaChatRequest
+            {
+                Model = settings.Model,
+                Stream = settings.UseStreaming,
+                Messages = messages
+            }, _jsonOptions);
+        }
+
+        private static void ApplyAuthentication(HttpRequestMessage request, string? apiKey, EndpointProtocol protocol)
+        {
+            if (string.IsNullOrWhiteSpace(apiKey))
+                return;
+
+            if (protocol == EndpointProtocol.OllamaChat)
+                request.Headers.TryAddWithoutValidation("x-api-key", apiKey);
+            else
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+        }
+
+        private async IAsyncEnumerable<string> ReadOpenAiResponseAsync(HttpResponseMessage response, bool useStreaming, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            if (!useStreaming)
+            {
+                var respJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 string output;
                 try
                 {
@@ -98,49 +157,121 @@ namespace TrayApp.Services
                 }
 
                 yield return output;
+                yield break;
             }
-            else
+
+            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using var reader = new StreamReader(stream);
+            var buffer = new char[1024];
+            var receivedAnyData = false;
+
+            while (!cancellationToken.IsCancellationRequested)
             {
-                using var stream = await res.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-                using var reader = new System.IO.StreamReader(stream);
-                var buffer = new char[1024];
-                var receivedAnyData = false;
+                var read = await reader.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                if (read == 0)
+                    break;
 
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    var read = await reader.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
-                    if (read == 0)
-                    {
-                        break;
-                    }
-
-                    if (read > 0)
-                    {
-                        receivedAnyData = true;
-                        var chunk = new string(buffer, 0, read);
-                        yield return chunk;
-                    }
-                    else
-                    {
-                        await Task.Delay(20, cancellationToken).ConfigureAwait(false);
-                    }
-                }
-
-                if (!receivedAnyData)
-                {
-                    _logger.LogWarning("Streaming-svar afsluttede uden data.");
-                    throw new ChatServiceException(
-                        ChatServiceErrorKind.Server,
-                        "Serveren svarede uden indhold. Prøv igen om lidt.");
-                }
-
-                _logger.LogInfo("AI-svar modtaget (streaming).");
+                receivedAnyData = true;
+                yield return new string(buffer, 0, read);
             }
+
+            if (!receivedAnyData)
+            {
+                _logger.LogWarning("Streaming-svar afsluttede uden data.");
+                throw new ChatServiceException(
+                    ChatServiceErrorKind.Server,
+                    "Serveren svarede uden indhold. Prøv igen om lidt.");
+            }
+
+            _logger.LogInfo("AI-svar modtaget (streaming).");
         }
 
-        public void Dispose()
+        private async IAsyncEnumerable<string> ReadOllamaResponseAsync(HttpResponseMessage response, bool useStreaming, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            _http.Dispose();
+            if (!useStreaming)
+            {
+                var respJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                string output;
+                try
+                {
+                    var resp = JsonSerializer.Deserialize<OllamaChatResponse>(respJson, _jsonOptions);
+                    _logger.LogInfo("AI-svar modtaget (ollama non-streaming).");
+                    output = resp?.Message?.Content ?? string.Empty;
+                }
+                catch
+                {
+                    _logger.LogWarning("Kunne ikke parse Ollama-svar som standardformat. Returnerer rå tekst.");
+                    output = respJson;
+                }
+
+                yield return output;
+                yield break;
+            }
+
+            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using var reader = new StreamReader(stream);
+            var receivedAnyFrame = false;
+            var receivedAnyText = false;
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var line = await reader.ReadLineAsync().WaitAsync(cancellationToken).ConfigureAwait(false);
+                if (line == null)
+                    break;
+
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                receivedAnyFrame = true;
+                string? content = null;
+
+                try
+                {
+                    var resp = JsonSerializer.Deserialize<OllamaChatResponse>(line, _jsonOptions);
+                    content = resp?.Message?.Content;
+                }
+                catch
+                {
+                    content = line;
+                }
+
+                if (!string.IsNullOrEmpty(content))
+                {
+                    receivedAnyText = true;
+                    yield return content;
+                }
+            }
+
+            if (!receivedAnyFrame || !receivedAnyText)
+            {
+                _logger.LogWarning("Streaming-svar fra Ollama afsluttede uden indhold.");
+                throw new ChatServiceException(
+                    ChatServiceErrorKind.Server,
+                    "Serveren svarede uden indhold. Prøv igen om lidt.");
+            }
+
+            _logger.LogInfo("AI-svar modtaget (ollama streaming).");
+        }
+
+        private static EndpointProtocol DetectEndpointProtocol(Uri endpointUri)
+        {
+            var path = endpointUri.AbsolutePath.Trim();
+            if (string.IsNullOrWhiteSpace(path) || path == "/" || path.Contains("/ollama/api/chat", StringComparison.OrdinalIgnoreCase))
+                return EndpointProtocol.OllamaChat;
+
+            return EndpointProtocol.OpenAiCompatible;
+        }
+
+        private static Uri ResolveRequestUri(Uri endpointUri, EndpointProtocol protocol)
+        {
+            if (protocol != EndpointProtocol.OllamaChat)
+                return endpointUri;
+
+            var path = endpointUri.AbsolutePath.Trim();
+            if (string.IsNullOrWhiteSpace(path) || path == "/")
+                return new Uri(endpointUri, "/v1/ollama/api/chat");
+
+            return endpointUri;
         }
 
         private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, bool useStreaming, CancellationToken cancellationToken)
@@ -191,6 +322,7 @@ namespace TrayApp.Services
                 400 => new ChatServiceException(ChatServiceErrorKind.Configuration, "AI-serveren afviste forespørgslen som ugyldig." + suffix),
                 401 or 403 => new ChatServiceException(ChatServiceErrorKind.Configuration, "Adgang blev afvist af AI-serveren. Kontrollér API key og endpoint." + suffix),
                 404 => new ChatServiceException(ChatServiceErrorKind.Configuration, "AI endpoint blev ikke fundet. Kontrollér URL'en i Indstillinger." + suffix),
+                405 => new ChatServiceException(ChatServiceErrorKind.Configuration, "AI endpoint afviste POST-kaldet. Kontrollér at URL'en peger på den rigtige chat-route." + suffix),
                 408 => new ChatServiceException(ChatServiceErrorKind.Timeout, "AI-serveren brugte for lang tid på at svare." + suffix),
                 429 => new ChatServiceException(ChatServiceErrorKind.Server, "AI-serveren afviser midlertidigt flere requests. Prøv igen om lidt." + suffix),
                 >= 500 => new ChatServiceException(ChatServiceErrorKind.Server, "AI-serveren rapporterede en intern fejl." + suffix),

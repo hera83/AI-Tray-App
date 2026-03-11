@@ -139,6 +139,13 @@ namespace TrayApp.Infrastructure
             return Task.CompletedTask;
         }
 
+        public Task DeleteAllAsync()
+        {
+            using var conn = _db.Open();
+            Execute(conn, null, "DELETE FROM sessions");
+            return Task.CompletedTask;
+        }
+
         // ── helpers ───────────────────────────────────────────────────────────
 
         private static string Iso(DateTime dt) =>
