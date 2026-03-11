@@ -1,0 +1,220 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- WINDOW & PAGE SIZING -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Window.Main.Height">720</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Window.Main.Width">1000</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Window.Settings.Height">620</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Window.Settings.Width">520</sys:Double>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LAYOUT SIZING (Panels, sidebars, content areas) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Sidebar.Width">220</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.EmptySidebar.Height">120</sys:Double>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FORM & INPUT SIZING -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Input.MinHeight">56</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Input.MaxHeight">180</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Input.MultilineHeight">72</sys:Double>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAT-SPECIFIC SIZING -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.ChatBubble.MaxWidth">640</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.ChatBubble.MaxWidth.Narrow">560</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.EmptyState.Width">420</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.FloatingButton.Width">152</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.FloatingButton.Height">38</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.EmptyStateHalo">280</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.EmptyStateBadge">52</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.StatusIndicator">12</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.TypingDot">8</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Control.DropdownAffordanceWidth">34</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Control.ScrollBarThickness">10</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.CheckBox.Box">16</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.CheckBox.Column">18</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.CheckBox.Gap">8</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Button.MinHeight">34</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Button.DialogWidth">90</sys:Double>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- PADDING & INTERNAL SPACING (Controls and containers) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Page-level padding -->
+  <Thickness x:Key="Thickness.Page.MainPadding">18</Thickness>
+  <Thickness x:Key="Thickness.Page.SettingsPadding">28,20,28,20</Thickness>
+  <Thickness x:Key="Thickness.Sidebar.Padding">16</Thickness>
+
+  <!-- Container padding -->
+  <Thickness x:Key="Thickness.Input.ContainerPadding">10</Thickness>
+  <Thickness x:Key="Thickness.Input.ControlPadding">8,6</Thickness>
+  <Thickness x:Key="Thickness.Card.Padding">12,10</Thickness>
+  <Thickness x:Key="Thickness.ToolTip.Padding">8,6</Thickness>
+  <Thickness x:Key="Thickness.Menu.ItemPadding">10,6</Thickness>
+  <Thickness x:Key="Thickness.List.ItemPadding">8,6</Thickness>
+  <Thickness x:Key="Thickness.Popup.ContentMargin">2</Thickness>
+
+  <!-- Chat-specific padding -->
+  <Thickness x:Key="Thickness.Chat.CanvasPadding">18,14</Thickness>
+  <Thickness x:Key="Thickness.Chat.BubblePadding">14,12</Thickness>
+  <Thickness x:Key="Thickness.Chat.ComposerPadding">14,12</Thickness>
+  <Thickness x:Key="Thickness.Chat.EmptyStatePadding">24,22</Thickness>
+
+  <!-- Button padding -->
+  <Thickness x:Key="Thickness.Button.PrimaryPadding">10,6</Thickness>
+  <Thickness x:Key="Thickness.Button.SecondaryPadding">8,6</Thickness>
+  <Thickness x:Key="Thickness.Badge.Padding">8,3</Thickness>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LIST & ITEM SPACING -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <Thickness x:Key="Thickness.List.ItemMargin">0,1,0,1</Thickness>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FORM FIELD SPACING (Standardized gaps in form layouts) -->
+  <!-- 4px-based scale: 4, 8, 12, 16, 20, 24 pixels -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Between label and input -->
+  <Thickness x:Key="Thickness.Form.LabelBottom">0,0,0,6</Thickness>
+
+  <!-- Between input and helper text -->
+  <Thickness x:Key="Thickness.Form.HelperTop">0,4,0,0</Thickness>
+
+  <!-- Between form field groups -->
+  <Thickness x:Key="Thickness.Form.FieldBottom">0,0,0,16</Thickness>
+
+  <!-- Between helper text and next field -->
+  <Thickness x:Key="Thickness.Form.HelperBottom">0,0,0,12</Thickness>
+
+  <!-- Smaller gap for related fields -->
+  <Thickness x:Key="Thickness.Form.HelperBottomSmall">0,0,0,8</Thickness>
+
+  <!-- Between form sections -->
+  <Thickness x:Key="Thickness.Form.SectionGap">0,0,0,20</Thickness>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION SPACING (Between major layout blocks) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Between header and content -->
+  <Thickness x:Key="Thickness.Layout.HeaderMargin">0,0,0,12</Thickness>
+
+  <!-- Between content sections -->
+  <Thickness x:Key="Thickness.Layout.SectionGap">0,0,0,20</Thickness>
+
+  <!-- Status card margin from header -->
+  <Thickness x:Key="Thickness.Layout.StatusStackTop">0,34,0,0</Thickness>
+
+  <!-- Bottom bar spacing -->
+  <Thickness x:Key="Thickness.Layout.BottomBarTop">0,16,0,0</Thickness>
+
+  <!-- Header subtitle spacing -->
+  <Thickness x:Key="Thickness.Layout.HeaderSubtitle">8,3,0,0</Thickness>
+
+  <!-- Sidebar subtitle spacing -->
+  <Thickness x:Key="Thickness.Layout.SidebarSubtitle">0,6,0,12</Thickness>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- CHAT LAYOUT SPACING -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Between message rows (left/right aligned) -->
+  <Thickness x:Key="Thickness.Chat.Row.Left">0,0,56,16</Thickness>
+  <Thickness x:Key="Thickness.Chat.Row.Right">56,0,0,16</Thickness>
+
+  <!-- Between role badge and bubble -->
+  <Thickness x:Key="Thickness.Chat.RoleBadge">0,0,0,6</Thickness>
+
+  <!-- Between bubble and timestamp -->
+  <Thickness x:Key="Thickness.Chat.Bubble.Left">0,4,0,0</Thickness>
+  <Thickness x:Key="Thickness.Chat.Bubble.Right">0,4,0,0</Thickness>
+
+  <!-- Timestamp positioning -->
+  <Thickness x:Key="Thickness.Chat.Timestamp">0,8,2,0</Thickness>
+
+  <!-- Composer top margin -->
+  <Thickness x:Key="Thickness.Chat.ComposerTop">0,14,0,0</Thickness>
+
+  <!-- Toolbar (buttons) margin -->
+  <Thickness x:Key="Thickness.Chat.ToolbarTop">0,10,0,0</Thickness>
+
+  <!-- Floating action button position -->
+  <Thickness x:Key="Thickness.Chat.FloatingButton">0,0,14,14</Thickness>
+
+  <!-- Typing indicator dot gap -->
+  <Thickness x:Key="Thickness.Chat.TypingDotGap">6,0,0,0</Thickness>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- INLINE ELEMENT SPACING (Small spacing for related elements) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <Thickness x:Key="Thickness.Inline.Left.6">6,0,0,0</Thickness>
+  <Thickness x:Key="Thickness.Inline.Left.10">10,0,0,0</Thickness>
+  <Thickness x:Key="Thickness.Inline.Right.8">0,0,8,0</Thickness>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- MARGIN UTILITIES (Explicit, single-direction margins) -->
+  <!-- 4px-based scale for precise control -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Top margins -->
+  <Thickness x:Key="Thickness.Margin.Top.2">0,2,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Top.3">0,3,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Top.4">0,4,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Top.6">0,6,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Top.8">0,8,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Top.10">0,10,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Top.12">0,12,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Top.16">0,16,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Top.20">0,20,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Top.24">0,24,0,0</Thickness>
+
+  <!-- Bottom margins -->
+  <Thickness x:Key="Thickness.Margin.Bottom.4">0,0,0,4</Thickness>
+  <Thickness x:Key="Thickness.Margin.Bottom.6">0,0,0,6</Thickness>
+  <Thickness x:Key="Thickness.Margin.Bottom.8">0,0,0,8</Thickness>
+  <Thickness x:Key="Thickness.Margin.Bottom.10">0,0,0,10</Thickness>
+  <Thickness x:Key="Thickness.Margin.Bottom.12">0,0,0,12</Thickness>
+  <Thickness x:Key="Thickness.Margin.Bottom.16">0,0,0,16</Thickness>
+  <Thickness x:Key="Thickness.Margin.Bottom.20">0,0,0,20</Thickness>
+
+  <!-- Right margins -->
+  <Thickness x:Key="Thickness.Margin.Right.4">0,0,4,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Right.6">0,0,6,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Right.8">0,0,8,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Right.12">0,0,12,0</Thickness>
+
+  <!-- Left margins -->
+  <Thickness x:Key="Thickness.Margin.Left.6">6,0,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Left.10">10,0,0,0</Thickness>
+  <Thickness x:Key="Thickness.Margin.Left.12">12,0,0,0</Thickness>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- STATE & VISUAL SPACING -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <Thickness x:Key="Thickness.Border.Normal">1</Thickness>
+  <Thickness x:Key="Thickness.Border.Focused">2</Thickness>
+
+  <!-- Animation/transition durations (milliseconds) -->
+  <sys:Int32 xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Duration.State.Transition">150</sys:Int32>
+  <sys:Int32 xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Duration.Hover.Transition">100</sys:Int32>
+
+  <!-- Opacity values for disabled states and hover layers -->
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Opacity.Disabled">0.5</Opacity.Disabled>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Opacity.DisabledContent">0.6</Opacity.DisabledContent>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Opacity.Hover.Overlay">0.08</Opacity.Hover.Overlay>
+
+</ResourceDictionary>

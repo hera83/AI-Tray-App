@@ -1,0 +1,130 @@
+<Window x:Class="TrayApp.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="clr-namespace:TrayApp.Behaviors"
+        Title="Indstillinger"
+        Height="{StaticResource Size.Window.Settings.Height}"
+        Width="{StaticResource Size.Window.Settings.Width}"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource Brush.Theme.WindowBackground}">
+
+    <Grid Margin="{StaticResource Thickness.Page.SettingsPadding}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <!-- ══ AI Gateway ══ -->
+                <TextBlock Text="AI Gateway" Style="{StaticResource SectionHeaderTextStyle}"/>
+                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+
+                <TextBlock Text="Base URL" Style="{StaticResource FieldLabelTextStyle}"/>
+                <TextBox Text="{Binding AiEndpoint, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource InputTextBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                <TextBlock Text="API Key" Style="{StaticResource FieldLabelTextStyle}"/>
+                <PasswordBox Margin="{StaticResource Thickness.Form.HelperTop}"
+                             Style="{StaticResource InputPasswordBoxStyle}"
+                             behaviors:PasswordBoxAssistant.BindPassword="True"
+                             behaviors:PasswordBoxAssistant.BoundPassword="{Binding ApiKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Gemt lokalt — vis aldrig i logfiler." Style="{StaticResource HelperTextStyle}" Margin="{StaticResource Thickness.Form.HelperBottom}"/>
+
+                <TextBlock Text="Model" Style="{StaticResource FieldLabelTextStyle}"/>
+                <TextBox Text="{Binding Model, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource InputTextBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                <!-- ══ Chat ══ -->
+                <TextBlock Text="Chat" Style="{StaticResource SectionHeaderTextStyle}"/>
+                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+
+                <TextBlock Text="System prompt" Style="{StaticResource FieldLabelTextStyle}"/>
+                <TextBox Text="{Binding SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource InputTextBoxStyle}" AcceptsReturn="True" Height="{StaticResource Size.Input.MultilineHeight}"
+                         VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                <Grid Margin="{StaticResource Thickness.Form.FieldBottom}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Temperature" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <Slider Minimum="0" Maximum="2" TickFrequency="0.1" IsSnapToTickEnabled="True"
+                            Value="{Binding Temperature}" Foreground="{DynamicResource Brush.Theme.Accent}"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding Temperature, StringFormat='{}{0:F1}'}"
+                               Style="{StaticResource BodyStyle}"
+                               VerticalAlignment="Bottom" Margin="{StaticResource Thickness.Margin.Left.12}"/>
+                </Grid>
+
+                <CheckBox Content="Brug streaming (server-sent events)"
+                          IsChecked="{Binding UseStreaming}"
+                          Style="{StaticResource ModernCheckBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                <!-- ══ App ══ -->
+                <TextBlock Text="App" Style="{StaticResource SectionHeaderTextStyle}"/>
+                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+
+                <CheckBox Content="Start minimeret til system tray"
+                          IsChecked="{Binding StartMinimizedToTray}"
+                          Style="{StaticResource ModernCheckBoxStyle}"/>
+
+                <CheckBox Content="Start app ved Windows-opstart"
+                          IsChecked="{Binding LaunchOnWindowsStartup}"
+                          Style="{StaticResource ModernCheckBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                <TextBlock Text="Theme" Style="{StaticResource FieldLabelTextStyle}"/>
+                <ComboBox ItemsSource="{Binding AvailableThemeModes}"
+                          SelectedItem="{Binding SelectedThemeMode}"
+                          Margin="{StaticResource Thickness.Form.HelperTop}" />
+                <TextBlock Text="Vælg mellem et lyst eller mørkt udtryk. Appen opdateres, når du gemmer."
+                           Style="{StaticResource HelperTextStyle}"
+                           Margin="{StaticResource Thickness.Form.HelperBottom}"/>
+
+                <TextBlock Text="Om appen" Style="{StaticResource SectionHeaderTextStyle}"/>
+                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+
+                <TextBlock Text="Version" Style="{StaticResource FieldLabelTextStyle}"/>
+                <TextBlock Text="{Binding AppVersion}" Style="{StaticResource BodyStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                <TextBlock Text="Logfil" Style="{StaticResource FieldLabelTextStyle}"/>
+                <TextBlock Text="{Binding LogFilePath}" Style="{StaticResource SecondaryBodyTextStyle}" TextWrapping="Wrap" Margin="{StaticResource Thickness.Form.HelperBottomSmall}"/>
+                <TextBlock Text="Loggen bruges til lokale fejl og startup-hændelser." Style="{StaticResource MutedBodyTextStyle}" />
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Bottom bar -->
+        <Grid Grid.Row="1" Margin="{StaticResource Thickness.Layout.BottomBarTop}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" Style="{StaticResource BodyStyle}"
+                       VerticalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource BodyStyle}">
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Feedback.Success}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsStatusError}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Feedback.Error}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <Button Grid.Column="1" Content="Annuller" Command="{Binding CancelCommand}"
+                    Width="{StaticResource Size.Button.DialogWidth}" Margin="{StaticResource Thickness.Margin.Right.8}" Style="{StaticResource SecondaryButtonStyle}"/>
+
+            <Button Grid.Column="2" Content="Gem" Command="{Binding SaveCommand}"
+                    Width="{StaticResource Size.Button.DialogWidth}" Style="{StaticResource PrimaryButtonStyle}"/>
+        </Grid>
+    </Grid>
+</Window>

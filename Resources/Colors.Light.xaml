@@ -1,0 +1,88 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Color x:Key="Color.Theme.WindowBackground">#FFF4F7FB</Color>
+  <Color x:Key="Color.Theme.SidebarBackground">#FFEAF0F7</Color>
+  <Color x:Key="Color.Theme.SurfaceBackground">#FFFFFFFF</Color>
+  <Color x:Key="Color.Theme.SurfaceElevatedBackground">#FFF8FBFF</Color>
+
+  <Color x:Key="Color.Theme.TextPrimary">#FF142033</Color>
+  <Color x:Key="Color.Theme.TextSecondary">#FF33465E</Color>
+  <Color x:Key="Color.Theme.TextMuted">#FF73839B</Color>
+  <Color x:Key="Color.Theme.TextOnAccent">#FFFFFFFF</Color>
+
+  <Color x:Key="Color.Theme.Accent">#FF2F6FE8</Color>
+  <Color x:Key="Color.Theme.AccentHover">#FF1F5FD8</Color>
+
+  <Color x:Key="Color.Theme.Border">#FFC5D5E6</Color>
+  <Color x:Key="Color.Theme.Divider">#FFE5ECF5</Color>
+
+  <Color x:Key="Color.Theme.InputBackground">#FFFFFFFF</Color>
+  <Color x:Key="Color.Theme.InputForeground">#FF142033</Color>
+
+  <Color x:Key="Color.Theme.ButtonPrimaryBackground">#FF2F6FE8</Color>
+  <Color x:Key="Color.Theme.ButtonPrimaryForeground">#FFFFFFFF</Color>
+    <Color x:Key="Color.Theme.ButtonSecondaryBackground">#FFEEF3FC</Color>
+    <Color x:Key="Color.Theme.ButtonSecondaryForeground">#FF1F3A52</Color>
+
+  <Color x:Key="Color.Theme.Message.UserBackground">#FF2F6FE8</Color>
+  <Color x:Key="Color.Theme.Message.AssistantBackground">#FFEAF1FA</Color>
+  <Color x:Key="Color.Theme.Chat.CanvasBackground">#FFF7FAFD</Color>
+  <Color x:Key="Color.Theme.Chat.ComposerBackground">#FFFFFFFF</Color>
+  <Color x:Key="Color.Theme.Chat.ComposerBorder">#FFD7E0EC</Color>
+  <Color x:Key="Color.Theme.Chat.Message.UserForeground">#FFFFFFFF</Color>
+  <Color x:Key="Color.Theme.Chat.Message.AssistantForeground">#FF162538</Color>
+  <Color x:Key="Color.Theme.Chat.Message.UserBorder">#FF2A62CE</Color>
+  <Color x:Key="Color.Theme.Chat.Message.AssistantBorder">#FFD9E4F0</Color>
+  <Color x:Key="Color.Theme.Chat.Timestamp">#FF7C8AA0</Color>
+  <Color x:Key="Color.Theme.Chat.RoleBadgeBackground">#1F2F6FE8</Color>
+  <Color x:Key="Color.Theme.Chat.RoleBadgeForeground">#FF2756AE</Color>
+  <Color x:Key="Color.Theme.Chat.EmptyStateBackground">#FFFFFFFF</Color>
+    <Color x:Key="Color.Theme.Chat.EmptyStateBorder">#FFC8DCF2</Color>
+  <Color x:Key="Color.Theme.Chat.EmptyStateAccent">#1F2F6FE8</Color>
+  <Color x:Key="Color.Theme.Chat.LoadingDot">#FF4C78D8</Color>
+  <Color x:Key="Color.Theme.Chat.FloatingActionBackground">#F8FFFFFF</Color>
+  <Color x:Key="Color.Theme.Chat.FloatingActionForeground">#FF28405B</Color>
+  <Color x:Key="Color.Theme.Chat.FloatingActionBorder">#FFD6E1ED</Color>
+
+  <Color x:Key="Color.Theme.Feedback.Error">#FFCF2F2F</Color>
+  <Color x:Key="Color.Theme.Feedback.Warning">#FFCB8A26</Color>
+  <Color x:Key="Color.Theme.Feedback.Success">#FF22A06B</Color>
+  <Color x:Key="Color.Theme.Feedback.Info">#FF1B79C8</Color>
+
+  <Color x:Key="Color.Theme.Feedback.ErrorBackground">#FFFFEEEE</Color>
+  <Color x:Key="Color.Theme.Feedback.ErrorBorder">#FFF2B5B5</Color>
+  <Color x:Key="Color.Theme.Feedback.ErrorForeground">#FF7F1D1D</Color>
+  <Color x:Key="Color.Theme.Feedback.ErrorMutedForeground">#FFA12A2A</Color>
+
+  <Color x:Key="Color.Theme.Feedback.SuccessBackground">#FFEEFDFA</Color>
+  <Color x:Key="Color.Theme.Feedback.SuccessBorder">#FFC4E8DD</Color>
+  <Color x:Key="Color.Theme.Feedback.SuccessForeground">#FF0F5F3D</Color>
+
+  <Color x:Key="Color.Theme.Feedback.WarningBackground">#FFFDF6EE</Color>
+  <Color x:Key="Color.Theme.Feedback.WarningBorder">#FFE8D5B8</Color>
+  <Color x:Key="Color.Theme.Feedback.WarningForeground">#FF5D4A1D</Color>
+
+  <Color x:Key="Color.Theme.Feedback.InfoBackground">#FFEEF5FF</Color>
+  <Color x:Key="Color.Theme.Feedback.InfoBorder">#FFC4D9F2</Color>
+  <Color x:Key="Color.Theme.Feedback.InfoForeground">#FF0F3D7F</Color>
+
+  <Color x:Key="Color.Theme.State.HoverBackground">#FFDCE8F8</Color>
+  <Color x:Key="Color.Theme.State.HoverOverlay">#FF2F6FE8</Color>
+  <Color x:Key="Color.Theme.State.PressedBackground">#FFD2E0F3</Color>
+  <Color x:Key="Color.Theme.State.PressedOverlay">#CC2F6FE8</Color>
+  <Color x:Key="Color.Theme.State.DisabledBackground">#FFE8EDF4</Color>
+  <Color x:Key="Color.Theme.State.DisabledForeground">#FF8A99AE</Color>
+  <Color x:Key="Color.Theme.State.FocusRing">#FF1F5FD8</Color>
+  <Color x:Key="Color.Theme.State.FocusRing.Thin">#FF2F6FE8</Color>
+
+  <Color x:Key="Color.Theme.Status.Default">#FF72829A</Color>
+  <Color x:Key="Color.Theme.Status.Initializing">#FF8B5CF6</Color>
+  <Color x:Key="Color.Theme.Status.Ready">#FF22A06B</Color>
+  <Color x:Key="Color.Theme.Status.Connecting">#FF258EDC</Color>
+  <Color x:Key="Color.Theme.Status.Sending">#FFCB8A26</Color>
+  <Color x:Key="Color.Theme.Status.Receiving">#FF2F6FE8</Color>
+  <Color x:Key="Color.Theme.Status.Offline">#FFCA607D</Color>
+  <Color x:Key="Color.Theme.Status.Error">#FFCF2F2F</Color>
+
+</ResourceDictionary>

@@ -1,0 +1,296 @@
+<Window x:Class="TrayApp.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:TrayApp.Behaviors"
+    xmlns:converters="clr-namespace:TrayApp.Converters"
+        Title="Tray AI Chat"
+        Height="{StaticResource Size.Window.Main.Height}"
+        Width="{StaticResource Size.Window.Main.Width}"
+        Background="{DynamicResource Brush.Theme.WindowBackground}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{StaticResource Size.Sidebar.Width}" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left sidebar for branding / future chats -->
+        <Border Grid.Column="0" Background="{DynamicResource Brush.Theme.SidebarBackground}" Padding="{StaticResource Thickness.Sidebar.Padding}">
+            <StackPanel>
+                <TextBlock Text="Tray AI" Style="{StaticResource DisplayMediumStyle}" />
+                <TextBlock Text="A lightweight desktop AI chat" Style="{StaticResource BodySmallStyle}" Margin="{StaticResource Thickness.Layout.SidebarSubtitle}" />
+                <StackPanel Margin="{StaticResource Thickness.Form.SectionGap}">
+                    <TextBlock Text="Status" Style="{StaticResource Heading3Style}" />
+                    <Border Margin="{StaticResource Thickness.Form.FieldBottom}" Background="{DynamicResource Brush.Theme.SurfaceBackground}" CornerRadius="{StaticResource CornerRadius.Medium}" Padding="{StaticResource Thickness.Input.ContainerPadding}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding StatusText}" Style="{StaticResource BodyStyle}" />
+                            <TextBlock Text="{Binding StatusDetail}" Style="{StaticResource BodySmallStyle}" TextWrapping="Wrap" Margin="{StaticResource Thickness.Form.HelperTop}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Height="{StaticResource Size.EmptySidebar.Height}" Margin="{StaticResource Thickness.Form.SectionGap}" Background="{DynamicResource Brush.Theme.InputBackground}" CornerRadius="{StaticResource CornerRadius.Medium}">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding EmptyStateTitle}" Style="{StaticResource CaptionStyle}" TextAlignment="Center" />
+                            <TextBlock Text="{Binding EmptyStateDescription}" Style="{StaticResource TinyStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}" TextAlignment="Center" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Main chat area -->
+        <Grid Grid.Column="1" Padding="{StaticResource Thickness.Page.MainPadding}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <DockPanel Grid.Row="0" LastChildFill="True" Margin="{StaticResource Thickness.Form.FieldBottom}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Chat" Style="{StaticResource Heading1Style}" />
+                    <TextBlock Text=" — Conversational assistant" Style="{StaticResource BodySmallStyle}" Margin="{StaticResource Thickness.Layout.HeaderSubtitle}" />
+                </StackPanel>
+                <Button DockPanel.Dock="Right" Content="Ny chat" Command="{Binding NewChatCommand}" Style="{StaticResource SecondaryButtonStyle}" />
+            </DockPanel>
+
+            <StackPanel Grid.Row="0" Margin="{StaticResource Thickness.Layout.StatusStackTop}">
+                <Border Style="{StaticResource StatusCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Width="{StaticResource Size.Chat.StatusIndicator}" Height="{StaticResource Size.Chat.StatusIndicator}" CornerRadius="{StaticResource CornerRadius.Small}" VerticalAlignment="Top" Margin="0,3,10,0">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{DynamicResource Brush.Theme.Status.Default}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CurrentStatus}" Value="Initializing">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Theme.Status.Initializing}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CurrentStatus}" Value="Ready">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Theme.Status.Ready}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CurrentStatus}" Value="Connecting">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Theme.Status.Connecting}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CurrentStatus}" Value="Sending">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Theme.Status.Sending}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CurrentStatus}" Value="Receiving">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Theme.Status.Receiving}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CurrentStatus}" Value="Offline">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Theme.Status.Offline}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CurrentStatus}" Value="Error">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Theme.Status.Error}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding StatusText}" Style="{StaticResource BodyStyle}" />
+                            <TextBlock Text="{Binding StatusDetail}" Style="{StaticResource BodySmallStyle}" Margin="{StaticResource Thickness.Form.HelperTop}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource ErrorBannerStyle}"
+                        Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="{Binding ErrorMessage}" Style="{StaticResource BodyStyle}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding ErrorHint}" Style="{StaticResource BodySmallStyle}" Margin="{StaticResource Thickness.Form.HelperTop}" TextWrapping="Wrap"
+                                   Visibility="{Binding ErrorHint, Converter={StaticResource NullOrEmptyToVisibilityConverter}}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- Messages -->
+                <Grid Grid.Row="1">
+                    <Border Style="{StaticResource ChatConversationSurfaceStyle}">
+                    <ScrollViewer x:Name="MessagesScroll" Grid.Row="0" VerticalScrollBarVisibility="Auto" Background="Transparent"
+                                  behaviors:ScrollViewerBehavior.Monitor="True"
+                                  behaviors:ScrollViewerBehavior.IsNearBottom="{Binding IsUserNearBottom, Mode=TwoWay}"
+                                  behaviors:ScrollViewerBehavior.ScrollToBottomTrigger="{Binding ScrollToBottomRequest}">
+                        <ItemsControl ItemsSource="{Binding Messages}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid x:Name="MessageRow" Margin="{StaticResource Thickness.Chat.Row.Left}">
+                                <StackPanel>
+                                    <Border x:Name="RoleBadge" Style="{StaticResource ChatRoleBadgeStyle}" Margin="{StaticResource Thickness.Chat.RoleBadge}">
+                                        <TextBlock x:Name="RoleBadgeText" Text="Assistant" Style="{StaticResource ChatRoleBadgeTextStyle}" />
+                                    </Border>
+
+                                    <Border x:Name="MessageBubble" Style="{StaticResource ChatAssistantBubbleStyle}" Margin="{StaticResource Thickness.Chat.Bubble.Left}">
+                                        <StackPanel>
+                                            <TextBlock x:Name="MessageText" Text="{Binding Content}" Style="{StaticResource ChatMessageTextStyle}" Visibility="{Binding Content, Converter={StaticResource NullOrEmptyToVisibilityConverter}}" />
+
+                                            <StackPanel x:Name="TypingIndicator" Orientation="Horizontal" Visibility="Collapsed">
+                                                <Ellipse Style="{StaticResource ChatTypingDotStyle}">
+                                                    <Ellipse.Triggers>
+                                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                            <BeginStoryboard>
+                                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                    </Ellipse.Triggers>
+                                                </Ellipse>
+                                                <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
+                                                    <Ellipse.Triggers>
+                                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                            <BeginStoryboard>
+                                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.15">
+                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                    </Ellipse.Triggers>
+                                                </Ellipse>
+                                                <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
+                                                    <Ellipse.Triggers>
+                                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                            <BeginStoryboard>
+                                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.3">
+                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                    </Ellipse.Triggers>
+                                                </Ellipse>
+                                                <TextBlock Text="AI skriver..." Style="{StaticResource CaptionStyle}" Margin="{StaticResource Thickness.Inline.Left.10}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <TextBlock x:Name="MessageTimestamp"
+                                               Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy · HH:mm}'}"
+                                               Style="{StaticResource ChatTimestampTextStyle}"
+                                               Margin="{StaticResource Thickness.Chat.Timestamp}"
+                                               HorizontalAlignment="Left" />
+                                </StackPanel>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Role}" Value="User">
+                                    <Setter TargetName="MessageRow" Property="Margin" Value="{StaticResource Thickness.Chat.Row.Right}" />
+                                    <Setter TargetName="RoleBadgeText" Property="Text" Value="Dig" />
+                                    <Setter TargetName="RoleBadge" Property="HorizontalAlignment" Value="Right" />
+                                    <Setter TargetName="MessageBubble" Property="Style" Value="{StaticResource ChatUserBubbleStyle}" />
+                                    <Setter TargetName="MessageText" Property="Style" Value="{StaticResource ChatMessageTextUserStyle}" />
+                                    <Setter TargetName="MessageTimestamp" Property="HorizontalAlignment" Value="Right" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Role}" Value="Assistant">
+                                    <Setter TargetName="RoleBadgeText" Property="Text" Value="Assistant" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsStreaming}" Value="True">
+                                    <Setter TargetName="TypingIndicator" Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                </ScrollViewer>
+                    </Border>
+
+                <!-- empty state when no messages -->
+                <Border Background="Transparent" Visibility="{Binding ShowEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <Border Width="{StaticResource Size.Chat.EmptyStateHalo}" Height="{StaticResource Size.Chat.EmptyStateHalo}" Background="{DynamicResource Brush.Theme.Chat.EmptyStateAccent}" CornerRadius="{StaticResource CornerRadius.Circle.Halo}" Opacity="0.8" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Border Style="{StaticResource ChatEmptyStateCardStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <StackPanel>
+                                <Border Width="{StaticResource Size.Chat.EmptyStateBadge}" Height="{StaticResource Size.Chat.EmptyStateBadge}" Background="{DynamicResource Brush.Theme.Chat.RoleBadgeBackground}" CornerRadius="{StaticResource CornerRadius.Circle.Badge}" HorizontalAlignment="Center">
+                                    <TextBlock Text="AI" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource BodyLargeStyle}" />
+                                </Border>
+                                <TextBlock Text="{Binding EmptyStateTitle}" Style="{StaticResource Heading1Style}" HorizontalAlignment="Center" Margin="{StaticResource Thickness.Form.SectionGap}" />
+                                <TextBlock Text="{Binding EmptyStateDescription}" Style="{StaticResource BodyStyle}" HorizontalAlignment="Center" Margin="{StaticResource Thickness.Form.FieldBottom}" TextWrapping="Wrap" TextAlignment="Center" />
+                                <TextBlock Text="Tip: Brug Shift+Enter for ny linje og Enter for at sende." Style="{StaticResource CaptionStyle}" HorizontalAlignment="Center" Margin="{StaticResource Thickness.Form.SectionGap}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Go to latest button -->
+                <Button Content="Gå til nyeste" Width="{StaticResource Size.Chat.FloatingButton.Width}" Height="{StaticResource Size.Chat.FloatingButton.Height}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="{StaticResource Thickness.Chat.FloatingButton}"
+                        Visibility="{Binding ShowNewMessages, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Command="{Binding GoToLatestCommand}"
+                    Style="{StaticResource ChatFloatingActionButtonStyle}" />
+            </Grid>
+
+            <!-- Input area -->
+            <Border Grid.Row="2" Style="{StaticResource ChatComposerContainerStyle}" Margin="{StaticResource Thickness.Chat.ComposerTop}">
+                <StackPanel>
+                    <Grid Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Style="{StaticResource ChatTypingDotStyle}">
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                            <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.15">
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                            <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.3">
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="AI arbejder på svaret..." Style="{StaticResource CaptionStyle}" Margin="{StaticResource Thickness.Inline.Left.10}" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <TextBox Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MinHeight="{StaticResource Size.Input.MinHeight}" Style="{StaticResource ChatComposerTextBoxStyle}"
+                             IsEnabled="{Binding IsInputEnabled}"
+                             ToolTip="Shift+Enter for ny linje · Enter for at sende"
+                             behaviors:EnterKeyBehavior.SendCommand="{Binding SendCommand}"
+                             behaviors:TextBoxAutoGrowBehavior.EnableAutoGrow="True"
+                             behaviors:TextBoxAutoGrowBehavior.MinHeight="{StaticResource Size.Input.MinHeight}"
+                             behaviors:TextBoxAutoGrowBehavior.MaxHeight="{StaticResource Size.Input.MaxHeight}"/>
+
+                    <DockPanel Margin="{StaticResource Thickness.Chat.ToolbarTop}" LastChildFill="False">
+                        <TextBlock DockPanel.Dock="Left" Text="Shift+Enter for ny linje" Style="{StaticResource CaptionStyle}" VerticalAlignment="Center" />
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <Button Content="Settings" Command="{Binding OpenSettingsCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="{StaticResource Thickness.Margin.Right.8}" />
+                            <Button Content="Stop" Command="{Binding StopGenerationCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="{StaticResource Thickness.Margin.Right.8}" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <Button Content="Send" Command="{Binding SendCommand}" Style="{StaticResource PrimaryButtonStyle}" IsEnabled="{Binding CanSend}" />
+                        </StackPanel>
+                    </DockPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

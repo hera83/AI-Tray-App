@@ -1,0 +1,123 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <SolidColorBrush x:Key="Brush.Theme.WindowBackground" Color="{DynamicResource Color.Theme.WindowBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.SidebarBackground" Color="{DynamicResource Color.Theme.SidebarBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.SurfaceBackground" Color="{DynamicResource Color.Theme.SurfaceBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.SurfaceElevatedBackground" Color="{DynamicResource Color.Theme.SurfaceElevatedBackground}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.TextPrimary" Color="{DynamicResource Color.Theme.TextPrimary}" />
+  <SolidColorBrush x:Key="Brush.Theme.TextSecondary" Color="{DynamicResource Color.Theme.TextSecondary}" />
+  <SolidColorBrush x:Key="Brush.Theme.TextMuted" Color="{DynamicResource Color.Theme.TextMuted}" />
+  <SolidColorBrush x:Key="Brush.Theme.TextOnAccent" Color="{DynamicResource Color.Theme.TextOnAccent}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.Accent" Color="{DynamicResource Color.Theme.Accent}" />
+  <SolidColorBrush x:Key="Brush.Theme.AccentHover" Color="{DynamicResource Color.Theme.AccentHover}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.Border" Color="{DynamicResource Color.Theme.Border}" />
+  <SolidColorBrush x:Key="Brush.Theme.Divider" Color="{DynamicResource Color.Theme.Divider}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.InputBackground" Color="{DynamicResource Color.Theme.InputBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.InputForeground" Color="{DynamicResource Color.Theme.InputForeground}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.ButtonPrimaryBackground" Color="{DynamicResource Color.Theme.ButtonPrimaryBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.ButtonPrimaryForeground" Color="{DynamicResource Color.Theme.ButtonPrimaryForeground}" />
+  <SolidColorBrush x:Key="Brush.Theme.ButtonSecondaryBackground" Color="{DynamicResource Color.Theme.ButtonSecondaryBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.ButtonSecondaryForeground" Color="{DynamicResource Color.Theme.ButtonSecondaryForeground}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.Message.UserBackground" Color="{DynamicResource Color.Theme.Message.UserBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Message.AssistantBackground" Color="{DynamicResource Color.Theme.Message.AssistantBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.CanvasBackground" Color="{DynamicResource Color.Theme.Chat.CanvasBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.ComposerBackground" Color="{DynamicResource Color.Theme.Chat.ComposerBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.ComposerBorder" Color="{DynamicResource Color.Theme.Chat.ComposerBorder}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.Message.UserForeground" Color="{DynamicResource Color.Theme.Chat.Message.UserForeground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.Message.AssistantForeground" Color="{DynamicResource Color.Theme.Chat.Message.AssistantForeground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.Message.UserBorder" Color="{DynamicResource Color.Theme.Chat.Message.UserBorder}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.Message.AssistantBorder" Color="{DynamicResource Color.Theme.Chat.Message.AssistantBorder}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.Timestamp" Color="{DynamicResource Color.Theme.Chat.Timestamp}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.RoleBadgeBackground" Color="{DynamicResource Color.Theme.Chat.RoleBadgeBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.RoleBadgeForeground" Color="{DynamicResource Color.Theme.Chat.RoleBadgeForeground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.EmptyStateBackground" Color="{DynamicResource Color.Theme.Chat.EmptyStateBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.EmptyStateBorder" Color="{DynamicResource Color.Theme.Chat.EmptyStateBorder}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.EmptyStateAccent" Color="{DynamicResource Color.Theme.Chat.EmptyStateAccent}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.LoadingDot" Color="{DynamicResource Color.Theme.Chat.LoadingDot}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.FloatingActionBackground" Color="{DynamicResource Color.Theme.Chat.FloatingActionBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.FloatingActionForeground" Color="{DynamicResource Color.Theme.Chat.FloatingActionForeground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Chat.FloatingActionBorder" Color="{DynamicResource Color.Theme.Chat.FloatingActionBorder}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.Error" Color="{DynamicResource Color.Theme.Feedback.Error}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.Warning" Color="{DynamicResource Color.Theme.Feedback.Warning}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.Success" Color="{DynamicResource Color.Theme.Feedback.Success}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.Info" Color="{DynamicResource Color.Theme.Feedback.Info}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.ErrorBackground" Color="{DynamicResource Color.Theme.Feedback.ErrorBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.ErrorBorder" Color="{DynamicResource Color.Theme.Feedback.ErrorBorder}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.ErrorForeground" Color="{DynamicResource Color.Theme.Feedback.ErrorForeground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.ErrorMutedForeground" Color="{DynamicResource Color.Theme.Feedback.ErrorMutedForeground}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.SuccessBackground" Color="{DynamicResource Color.Theme.Feedback.SuccessBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.SuccessBorder" Color="{DynamicResource Color.Theme.Feedback.SuccessBorder}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.SuccessForeground" Color="{DynamicResource Color.Theme.Feedback.SuccessForeground}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.WarningBackground" Color="{DynamicResource Color.Theme.Feedback.WarningBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.WarningBorder" Color="{DynamicResource Color.Theme.Feedback.WarningBorder}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.WarningForeground" Color="{DynamicResource Color.Theme.Feedback.WarningForeground}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.InfoBackground" Color="{DynamicResource Color.Theme.Feedback.InfoBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.InfoBorder" Color="{DynamicResource Color.Theme.Feedback.InfoBorder}" />
+  <SolidColorBrush x:Key="Brush.Theme.Feedback.InfoForeground" Color="{DynamicResource Color.Theme.Feedback.InfoForeground}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.State.HoverBackground" Color="{DynamicResource Color.Theme.State.HoverBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.State.HoverOverlay" Color="{DynamicResource Color.Theme.State.HoverOverlay}" />
+  <SolidColorBrush x:Key="Brush.Theme.State.PressedBackground" Color="{DynamicResource Color.Theme.State.PressedBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.State.PressedOverlay" Color="{DynamicResource Color.Theme.State.PressedOverlay}" />
+  <SolidColorBrush x:Key="Brush.Theme.State.DisabledBackground" Color="{DynamicResource Color.Theme.State.DisabledBackground}" />
+  <SolidColorBrush x:Key="Brush.Theme.State.DisabledForeground" Color="{DynamicResource Color.Theme.State.DisabledForeground}" />
+  <SolidColorBrush x:Key="Brush.Theme.State.FocusRing" Color="{DynamicResource Color.Theme.State.FocusRing}" />
+  <SolidColorBrush x:Key="Brush.Theme.State.FocusRing.Thin" Color="{DynamicResource Color.Theme.State.FocusRing.Thin}" />
+
+  <SolidColorBrush x:Key="Brush.Theme.Status.Default" Color="{DynamicResource Color.Theme.Status.Default}" />
+  <SolidColorBrush x:Key="Brush.Theme.Status.Initializing" Color="{DynamicResource Color.Theme.Status.Initializing}" />
+  <SolidColorBrush x:Key="Brush.Theme.Status.Ready" Color="{DynamicResource Color.Theme.Status.Ready}" />
+  <SolidColorBrush x:Key="Brush.Theme.Status.Connecting" Color="{DynamicResource Color.Theme.Status.Connecting}" />
+  <SolidColorBrush x:Key="Brush.Theme.Status.Sending" Color="{DynamicResource Color.Theme.Status.Sending}" />
+  <SolidColorBrush x:Key="Brush.Theme.Status.Receiving" Color="{DynamicResource Color.Theme.Status.Receiving}" />
+  <SolidColorBrush x:Key="Brush.Theme.Status.Offline" Color="{DynamicResource Color.Theme.Status.Offline}" />
+  <SolidColorBrush x:Key="Brush.Theme.Status.Error" Color="{DynamicResource Color.Theme.Status.Error}" />
+
+  <!-- Compatibility aliases -->
+  <SolidColorBrush x:Key="Brush.Background.Window" Color="{DynamicResource Color.Theme.WindowBackground}" />
+  <SolidColorBrush x:Key="Brush.Background.Sidebar" Color="{DynamicResource Color.Theme.SidebarBackground}" />
+  <SolidColorBrush x:Key="Brush.Background.Input" Color="{DynamicResource Color.Theme.InputBackground}" />
+  <SolidColorBrush x:Key="Brush.Background.Surface" Color="{DynamicResource Color.Theme.SurfaceBackground}" />
+  <SolidColorBrush x:Key="Brush.Background.SurfaceAlt" Color="{DynamicResource Color.Theme.SurfaceElevatedBackground}" />
+  <SolidColorBrush x:Key="Brush.Background.Bubble.User" Color="{DynamicResource Color.Theme.Message.UserBackground}" />
+  <SolidColorBrush x:Key="Brush.Background.Bubble.Assistant" Color="{DynamicResource Color.Theme.Message.AssistantBackground}" />
+  <SolidColorBrush x:Key="Brush.Background.Banner.Error" Color="{DynamicResource Color.Theme.Feedback.ErrorBackground}" />
+
+  <SolidColorBrush x:Key="Brush.Border.Default" Color="{DynamicResource Color.Theme.Border}" />
+  <SolidColorBrush x:Key="Brush.Border.Subtle" Color="{DynamicResource Color.Theme.Divider}" />
+  <SolidColorBrush x:Key="Brush.Border.Error" Color="{DynamicResource Color.Theme.Feedback.ErrorBorder}" />
+
+  <SolidColorBrush x:Key="Brush.Foreground.Primary" Color="{DynamicResource Color.Theme.TextPrimary}" />
+  <SolidColorBrush x:Key="Brush.Foreground.Secondary" Color="{DynamicResource Color.Theme.TextSecondary}" />
+  <SolidColorBrush x:Key="Brush.Foreground.Tertiary" Color="{DynamicResource Color.Theme.TextMuted}" />
+  <SolidColorBrush x:Key="Brush.Foreground.Muted" Color="{DynamicResource Color.Theme.TextMuted}" />
+  <SolidColorBrush x:Key="Brush.Foreground.Caption" Color="{DynamicResource Color.Theme.TextMuted}" />
+  <SolidColorBrush x:Key="Brush.Foreground.ErrorStrong" Color="{DynamicResource Color.Theme.Feedback.ErrorForeground}" />
+  <SolidColorBrush x:Key="Brush.Foreground.Error" Color="{DynamicResource Color.Theme.Feedback.ErrorMutedForeground}" />
+
+  <SolidColorBrush x:Key="Brush.Accent" Color="{DynamicResource Color.Theme.Accent}" />
+  <SolidColorBrush x:Key="Brush.Success" Color="{DynamicResource Color.Theme.Feedback.Success}" />
+  <SolidColorBrush x:Key="Brush.Error" Color="{DynamicResource Color.Theme.Feedback.Error}" />
+
+  <SolidColorBrush x:Key="Brush.Status.Default" Color="{DynamicResource Color.Theme.Status.Default}" />
+  <SolidColorBrush x:Key="Brush.Status.Initializing" Color="{DynamicResource Color.Theme.Status.Initializing}" />
+  <SolidColorBrush x:Key="Brush.Status.Ready" Color="{DynamicResource Color.Theme.Status.Ready}" />
+  <SolidColorBrush x:Key="Brush.Status.Connecting" Color="{DynamicResource Color.Theme.Status.Connecting}" />
+  <SolidColorBrush x:Key="Brush.Status.Sending" Color="{DynamicResource Color.Theme.Status.Sending}" />
+  <SolidColorBrush x:Key="Brush.Status.Receiving" Color="{DynamicResource Color.Theme.Status.Receiving}" />
+  <SolidColorBrush x:Key="Brush.Status.Offline" Color="{DynamicResource Color.Theme.Status.Offline}" />
+  <SolidColorBrush x:Key="Brush.Status.Error" Color="{DynamicResource Color.Theme.Status.Error}" />
+
+</ResourceDictionary>

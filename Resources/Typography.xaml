@@ -1,0 +1,211 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+  <!-- Font family -->
+  <FontFamily x:Key="FontFamily.Base">Segoe UI</FontFamily>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FONT SIZE SCALE (Complete hierarchy for all UI levels) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Display scale: Large, bold headings for hero content -->
+  <sys:Double x:Key="FontSize.Display.XL">28</sys:Double>  <!-- App titles, main headers -->
+  <sys:Double x:Key="FontSize.Display.Large">24</sys:Double> <!-- Page headers, modal titles -->
+  <sys:Double x:Key="FontSize.Display.Medium">20</sys:Double> <!-- Sidebar branding -->
+
+  <!-- Heading scale: Section organization -->
+  <sys:Double x:Key="FontSize.Heading.1">18</sys:Double>  <!-- Main section headers -->
+  <sys:Double x:Key="FontSize.Heading.2">16</sys:Double>  <!-- Subsection headers -->
+  <sys:Double x:Key="FontSize.Heading.3">14</sys:Double>  <!-- Small section headers -->
+
+  <!-- Body scale: Main content readability -->
+  <sys:Double x:Key="FontSize.Body.Large">14</sys:Double>  <!-- Emphasized content, important text -->
+  <sys:Double x:Key="FontSize.Body">13</sys:Double>       <!-- Default body text, chat messages -->
+  <sys:Double x:Key="FontSize.Body.Small">12</sys:Double> <!-- Secondary content, helper text -->
+
+  <!-- Caption scale: UI labels and metadata -->
+  <sys:Double x:Key="FontSize.Caption">11</sys:Double>    <!-- Field labels, timestamps, badges -->
+  <sys:Double x:Key="FontSize.Tiny">10</sys:Double>       <!-- Meta info, very small labels -->
+
+  <!-- Legacy aliases for backwards compatibility -->
+  <sys:Double x:Key="FontSize.Display">{StaticResource FontSize.Display.Medium}</sys:Double>
+  <sys:Double x:Key="FontSize.Heading">{StaticResource FontSize.Heading.1}</sys:Double>
+  <sys:Double x:Key="FontSize.Emphasis">{StaticResource FontSize.Body.Large}</sys:Double>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FONT WEIGHT SCALE (Explicit weights for clarity) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <FontWeight x:Key="FontWeight.Light">Light</FontWeight>          <!-- Not frequently used -->
+  <FontWeight x:Key="FontWeight.Regular">Normal</FontWeight>       <!-- Default, body text -->
+  <FontWeight x:Key="FontWeight.Medium">Medium</FontWeight>        <!-- Subtle emphasis -->
+  <FontWeight x:Key="FontWeight.SemiBold">SemiBold</FontWeight>    <!-- UI controls, labels -->
+  <FontWeight x:Key="FontWeight.Bold">Bold</FontWeight>           <!-- Strong emphasis, headings -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LINE HEIGHT SCALE (Vertical space within text) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <sys:Double x:Key="LineHeight.Tight">20</sys:Double>   <!-- Headings, tight spacing (1.0x) -->
+  <sys:Double x:Key="LineHeight.Normal">22</sys:Double>  <!-- Body text, default (1.6x for 13px) -->
+  <sys:Double x:Key="LineHeight.Relaxed">26</sys:Double> <!-- Long form content, better readability -->
+  <sys:Double x:Key="LineHeight.Loose">30</sys:Double>   <!-- Chat messages, emphasis -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LETTER SPACING SCALE (Horizontal spacing within text) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <sys:Double x:Key="LetterSpacing.Tight">-0.5</sys:Double> <!-- Headings, compact -->
+  <sys:Double x:Key="LetterSpacing.Normal">0</sys:Double>    <!-- Default -->
+  <sys:Double x:Key="LetterSpacing.Wide">0.5</sys:Double>    <!-- Labels, emphasis -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- TEXT STYLES - Display Scale -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <Style x:Key="DisplayXLStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Display.XL}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Bold}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+  </Style>
+
+  <Style x:Key="DisplayLargeStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Display.Large}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Bold}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+  </Style>
+
+  <Style x:Key="DisplayMediumStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Display.Medium}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Bold}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+  </Style>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- TEXT STYLES - Heading Scale -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <Style x:Key="Heading1Style" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Heading.1}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Bold}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+  </Style>
+
+  <Style x:Key="Heading2Style" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Heading.2}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Bold}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+  </Style>
+
+  <Style x:Key="Heading3Style" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Heading.3}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.SemiBold}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Normal}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+  </Style>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- TEXT STYLES - Body Scale -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <Style x:Key="BodyLargeStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body.Large}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Regular}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Normal}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+  </Style>
+
+  <Style x:Key="BodyStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Regular}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Normal}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+  </Style>
+
+  <Style x:Key="BodySmallStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body.Small}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Regular}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Normal}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextSecondary}" />
+  </Style>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- TEXT STYLES - Caption & Metadata -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <Style x:Key="CaptionStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Caption}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Regular}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextMuted}" />
+  </Style>
+
+  <Style x:Key="TinyStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Tiny}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Regular}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextMuted}" />
+  </Style>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LEGACY STYLES (Compatibility with existing code) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <Style TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+  </Style>
+
+  <Style x:Key="SectionHeaderTextStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Caption}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.SemiBold}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextMuted}" />
+    <Setter Property="Margin" Value="0,14,0,8" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
+  </Style>
+
+  <Style x:Key="FieldLabelTextStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Medium}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextSecondary}" />
+    <Setter Property="Margin" Value="0,0,0,6" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
+  </Style>
+
+  <Style x:Key="HelperTextStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body.Small}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Regular}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextMuted}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Normal}" />
+  </Style>
+
+  <Style x:Key="SecondaryBodyTextStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Regular}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextSecondary}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Normal}" />
+  </Style>
+
+  <Style x:Key="MutedBodyTextStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Regular}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextMuted}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Normal}" />
+  </Style>
+
+</ResourceDictionary>
