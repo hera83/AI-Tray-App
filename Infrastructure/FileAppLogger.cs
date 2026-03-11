@@ -31,14 +31,20 @@ namespace TrayApp.Infrastructure
                 .Append("] ")
                 .Append(message);
 
-            if (exception != null)
+            var current = exception;
+            var depth = 0;
+            while (current != null)
             {
-                sb.AppendLine()
-                  .Append(exception.GetType().FullName)
-                  .Append(": ")
-                  .Append(exception.Message)
-                  .AppendLine()
-                  .Append(exception.StackTrace);
+                sb.AppendLine();
+                if (depth > 0)
+                    sb.Append("  --> InnerException: ");
+                sb.Append(current.GetType().FullName)
+                    .Append(": ")
+                    .Append(current.Message)
+                    .AppendLine()
+                    .Append(current.StackTrace);
+                current = current.InnerException;
+                depth++;
             }
 
             lock (_sync)

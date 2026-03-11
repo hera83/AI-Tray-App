@@ -1,0 +1,41 @@
+# Build output
+bin/
+obj/
+artifacts/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE folders
+.vs/
+.idea/
+.vscode/
+
+# NuGet packages
+packages/
+*.nupkg
+*.snupkg
+
+# Test and coverage output
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+
+# SQLite transient files
+*.db-wal
+*.db-shm
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini

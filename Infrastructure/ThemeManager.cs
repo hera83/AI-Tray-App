@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using TrayApp.Services;
+using ThemeMode = TrayApp.Services.ThemeMode;
 
 namespace TrayApp.Infrastructure
 {
@@ -10,11 +11,11 @@ namespace TrayApp.Infrastructure
     {
         private const string DarkThemePath = "Themes/Theme.Dark.xaml";
         private const string LightThemePath = "Themes/Theme.Light.xaml";
-        private readonly Application _application;
+        private readonly System.Windows.Application _application;
 
         public ThemeMode CurrentTheme { get; private set; } = ThemeMode.Dark;
 
-        public ThemeManager(Application application)
+        public ThemeManager(System.Windows.Application application)
         {
             _application = application ?? throw new ArgumentNullException(nameof(application));
         }

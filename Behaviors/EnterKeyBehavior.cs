@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using WpfTextBox = System.Windows.Controls.TextBox;
 
 namespace TrayApp.Behaviors
 {
@@ -14,7 +15,7 @@ namespace TrayApp.Behaviors
 
         private static void OnSendCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is TextBox tb)
+            if (d is WpfTextBox tb)
             {
                 if (e.NewValue != null)
                 {
@@ -27,9 +28,9 @@ namespace TrayApp.Behaviors
             }
         }
 
-        private static void Tb_PreviewKeyDown(object? sender, KeyEventArgs e)
+        private static void Tb_PreviewKeyDown(object? sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (sender is TextBox tb && e.Key == Key.Enter)
+            if (sender is WpfTextBox tb && e.Key == Key.Enter)
             {
                 var cmd = GetSendCommand(tb);
                 if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)

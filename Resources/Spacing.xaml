@@ -15,6 +15,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
 
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Sidebar.Width">220</sys:Double>
+  <GridLength x:Key="GridLength.Sidebar.Width">220</GridLength>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.EmptySidebar.Height">120</sys:Double>
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -213,8 +214,8 @@
   <sys:Int32 xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Duration.Hover.Transition">100</sys:Int32>
 
   <!-- Opacity values for disabled states and hover layers -->
-  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Opacity.Disabled">0.5</Opacity.Disabled>
-  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Opacity.DisabledContent">0.6</Opacity.DisabledContent>
-  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Opacity.Hover.Overlay">0.08</Opacity.Hover.Overlay>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Opacity.Disabled">0.5</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Opacity.DisabledContent">0.6</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Opacity.Hover.Overlay">0.08</sys:Double>
 
 </ResourceDictionary>

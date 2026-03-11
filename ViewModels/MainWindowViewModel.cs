@@ -7,6 +7,7 @@ using System.Windows.Input;
 using TrayApp.Infrastructure;
 using TrayApp.Models;
 using TrayApp.Services;
+using ChatMessage = TrayApp.Models.Message;
 
 namespace TrayApp.ViewModels
 {
@@ -23,7 +24,7 @@ namespace TrayApp.ViewModels
         private int _sendGate;
         private CancellationTokenSource? _generationCts;
 
-        public ObservableCollection<Message> Messages { get; } = new();
+        public ObservableCollection<ChatMessage> Messages { get; } = new();
 
         private bool _isUserNearBottom = true;
         public bool IsUserNearBottom
@@ -239,7 +240,7 @@ namespace TrayApp.ViewModels
             ScrollToBottomRequest++;
         }
 
-        private void AddMessage(Message message)
+        private void AddMessage(ChatMessage message)
         {
             if (ActiveSession == null)
                 return;
@@ -284,7 +285,7 @@ namespace TrayApp.ViewModels
                     return;
                 }
 
-                var user = new Message
+                var user = new ChatMessage
                 {
                     Role = MessageRole.User,
                     Content = prompt,
@@ -292,7 +293,7 @@ namespace TrayApp.ViewModels
                 };
                 AddMessage(user);
 
-                var assistant = new Message
+                var assistant = new ChatMessage
                 {
                     Role = MessageRole.Assistant,
                     Content = string.Empty,
@@ -372,7 +373,7 @@ namespace TrayApp.ViewModels
                 UpdatedAt = DateTime.UtcNow
             };
 
-            session.Messages.Add(new Message
+            session.Messages.Add(new ChatMessage
             {
                 Role = MessageRole.Assistant,
                 Content = initialAssistantMessage,
@@ -402,7 +403,7 @@ namespace TrayApp.ViewModels
             }
         }
 
-        private void HandleChatServiceException(ChatServiceException ex, Message assistant)
+        private void HandleChatServiceException(ChatServiceException ex, ChatMessage assistant)
         {
             switch (ex.Kind)
             {
@@ -452,7 +453,7 @@ namespace TrayApp.ViewModels
 
         private static Task RunOnUiThreadAsync(Action action)
         {
-            var dispatcher = Application.Current.Dispatcher;
+            var dispatcher = System.Windows.Application.Current.Dispatcher;
             if (dispatcher.CheckAccess())
             {
                 action();

@@ -106,7 +106,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" Style="{StaticResource BodyStyle}"
+            <TextBlock Grid.Column="0" Text="{Binding StatusMessage}"
                        VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource BodyStyle}">

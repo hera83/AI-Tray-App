@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using TrayApp.Models;
+using ChatMessage = TrayApp.Models.Message;
 
 namespace TrayApp.Infrastructure
 {
@@ -106,7 +107,7 @@ namespace TrayApp.Infrastructure
                     var sid = reader.GetString(1);
                     if (!sessionIndex.TryGetValue(sid, out var session)) continue;
 
-                    session.Messages.Add(new Message
+                    session.Messages.Add(new ChatMessage
                     {
                         Id         = Guid.Parse(reader.GetString(0)),
                         Role       = (MessageRole)reader.GetInt32(2),

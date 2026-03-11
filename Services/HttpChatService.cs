@@ -80,21 +80,24 @@ namespace TrayApp.Services
             if (!s.UseStreaming)
             {
                 var respJson = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
+                string output;
                 try
                 {
                     var resp = JsonSerializer.Deserialize<AiChatResponse>(respJson, _jsonOptions);
-                    var text = resp?.Choices != null && resp.Choices.Length > 0 && resp.Choices[0].Message != null
-                        ? resp.Choices[0].Message.Content
-                        : respJson;
+                    var text = resp?.Choices is { Length: > 0 }
+                        ? resp.Choices[0].Message?.Content
+                        : null;
 
                     _logger.LogInfo("AI-svar modtaget (non-streaming).");
-                    yield return text ?? string.Empty;
+                    output = text ?? string.Empty;
                 }
                 catch
                 {
                     _logger.LogWarning("Kunne ikke parse AI-svar som standard chat-format. Returnerer rå tekst.");
-                    yield return respJson;
+                    output = respJson;
                 }
+
+                yield return output;
             }
             else
             {
@@ -103,9 +106,14 @@ namespace TrayApp.Services
                 var buffer = new char[1024];
                 var receivedAnyData = false;
 
-                while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
+                while (!cancellationToken.IsCancellationRequested)
                 {
                     var read = await reader.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                    if (read == 0)
+                    {
+                        break;
+                    }
+
                     if (read > 0)
                     {
                         receivedAnyData = true;

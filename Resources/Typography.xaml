@@ -29,9 +29,9 @@
   <sys:Double x:Key="FontSize.Tiny">10</sys:Double>       <!-- Meta info, very small labels -->
 
   <!-- Legacy aliases for backwards compatibility -->
-  <sys:Double x:Key="FontSize.Display">{StaticResource FontSize.Display.Medium}</sys:Double>
-  <sys:Double x:Key="FontSize.Heading">{StaticResource FontSize.Heading.1}</sys:Double>
-  <sys:Double x:Key="FontSize.Emphasis">{StaticResource FontSize.Body.Large}</sys:Double>
+  <sys:Double x:Key="FontSize.Display">20</sys:Double>
+  <sys:Double x:Key="FontSize.Heading">18</sys:Double>
+  <sys:Double x:Key="FontSize.Emphasis">14</sys:Double>
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <!-- FONT WEIGHT SCALE (Explicit weights for clarity) -->

@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using WpfTextBox = System.Windows.Controls.TextBox;
 
 namespace TrayApp.Behaviors
 {
@@ -26,7 +27,7 @@ namespace TrayApp.Behaviors
 
         private static void OnEnableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is TextBox tb)
+            if (d is WpfTextBox tb)
             {
                 if ((bool)e.NewValue)
                 {
@@ -43,15 +44,15 @@ namespace TrayApp.Behaviors
 
         private static void Tb_Loaded(object sender, RoutedEventArgs e)
         {
-            if (sender is TextBox tb) AdjustHeight(tb);
+            if (sender is WpfTextBox tb) AdjustHeight(tb);
         }
 
         private static void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (sender is TextBox tb) AdjustHeight(tb);
+            if (sender is WpfTextBox tb) AdjustHeight(tb);
         }
 
-        private static void AdjustHeight(TextBox tb)
+        private static void AdjustHeight(WpfTextBox tb)
         {
             try
             {

@@ -7,7 +7,7 @@ using TrayApp.Infrastructure;
 
 namespace TrayApp
 {
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         private TrayService? _trayService;
         private MainWindowViewModel? _mainViewModel;
@@ -100,7 +100,7 @@ namespace TrayApp
             catch (Exception ex)
             {
                 _logger?.LogError("Fatal fejl under startup.", ex);
-                MessageBox.Show(
+                System.Windows.MessageBox.Show(
                     "Appen kunne ikke starte korrekt. Se logfilen i AppData/TrayApp/logs for detaljer.",
                     AppInfo.ProductName,
                     MessageBoxButton.OK,
@@ -115,7 +115,7 @@ namespace TrayApp
             {
                 _logger?.LogError("Ubehandlet UI-fejl.", args.Exception);
                 args.Handled = true;
-                MessageBox.Show(
+                System.Windows.MessageBox.Show(
                     "Der opstod en uventet fejl i brugerfladen. Fejlen er logget lokalt.",
                     AppInfo.ProductName,
                     MessageBoxButton.OK,

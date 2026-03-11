@@ -15,7 +15,7 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="{StaticResource Size.Sidebar.Width}" />
+            <ColumnDefinition Width="{StaticResource GridLength.Sidebar.Width}" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -43,7 +43,7 @@
         </Border>
 
         <!-- Main chat area -->
-        <Grid Grid.Column="1" Padding="{StaticResource Thickness.Page.MainPadding}">
+        <Grid Grid.Column="1" Margin="{StaticResource Thickness.Page.MainPadding}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
