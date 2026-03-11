@@ -1,5 +1,9 @@
 # Tray AI Chat (WPF)
 
+[![Latest Release](https://img.shields.io/github/v/release/hera83/AI-Tray-App?display_name=tag)](https://github.com/hera83/AI-Tray-App/releases)
+![.NET](https://img.shields.io/badge/.NET-net7.0--windows-512BD4)
+![Platform](https://img.shields.io/badge/Platform-Windows-0078D6)
+
 This is a minimal native Windows WPF tray app scaffold (C#/.NET) with a Messenger-like chat UI and MVVM structure.
 
 Files created and responsibilities are explained in the repository and below.
