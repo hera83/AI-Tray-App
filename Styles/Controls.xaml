@@ -625,21 +625,49 @@
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Padding" Value="0" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="UseLayoutRounding" Value="True" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="TabControl">
           <Grid KeyboardNavigation.TabNavigation="Local"
-                SnapsToDevicePixels="True">
+                ClipToBounds="False"
+                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                UseLayoutRounding="{TemplateBinding UseLayoutRounding}">
             <Grid.RowDefinitions>
-              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" MinHeight="44" />
               <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TabPanel x:Name="HeaderPanel"
-                      Grid.Row="0"
-                      Margin="0,0,0,14"
-                      IsItemsHost="True"
-                      Panel.ZIndex="1" />
+            <Border Grid.Row="0"
+                    Margin="0,0,0,14"
+                    Background="Transparent"
+                    ClipToBounds="False">
+                  <Border Padding="0,4,28,4"
+                      Background="Transparent"
+                      ClipToBounds="False"
+                    SnapsToDevicePixels="True"
+                    UseLayoutRounding="True">
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden"
+                              VerticalScrollBarVisibility="Disabled"
+                              CanContentScroll="False"
+                              Focusable="False"
+                      Background="Transparent"
+                      ClipToBounds="False"
+                      SnapsToDevicePixels="True"
+                      UseLayoutRounding="True">
+                  <TabPanel x:Name="HeaderPanel"
+                            Margin="0,0,0,2"
+                            IsItemsHost="True"
+                            ClipToBounds="False"
+                            HorizontalAlignment="Left"
+                    KeyboardNavigation.TabIndex="1"
+                    SnapsToDevicePixels="True"
+                    UseLayoutRounding="True"
+                            Panel.ZIndex="1" />
+                </ScrollViewer>
+              </Border>
+            </Border>
 
             <Border Grid.Row="1"
                     Background="{DynamicResource Brush.Theme.SurfaceBackground}"
@@ -658,34 +686,61 @@
   </Style>
 
   <Style TargetType="TabItem">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextMuted}" />
-    <Setter Property="Padding" Value="14,8" />
-    <Setter Property="Margin" Value="0,0,8,0" />
+    <Setter Property="Background" Value="{DynamicResource Brush.Theme.SurfaceElevatedBackground}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextSecondary}" />
+    <Setter Property="Padding" Value="14,6,14,6" />
+    <Setter Property="Margin" Value="0,0,4,0" />
+    <Setter Property="MinHeight" Value="38" />
+    <Setter Property="MinWidth" Value="80" />
+    <Setter Property="Panel.ZIndex" Value="0" />
     <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.Medium}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.Border}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="UseLayoutRounding" Value="True" />
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="TabItem">
-          <Border x:Name="TabBorder"
-                  Background="{TemplateBinding Background}"
-                  BorderBrush="Transparent"
-                  BorderThickness="1"
-                  CornerRadius="{StaticResource CornerRadius.Medium}"
-                  Padding="{TemplateBinding Padding}">
-            <ContentPresenter HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              ContentSource="Header"
-                              RecognizesAccessKey="True" />
-          </Border>
+          <Grid x:Name="TabRoot"
+                Background="Transparent"
+                ClipToBounds="False"
+                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                UseLayoutRounding="{TemplateBinding UseLayoutRounding}">
+            <Border x:Name="TabBorder"
+              Margin="0,0,4,0"
+              MinWidth="{TemplateBinding MinWidth}"
+                    MinHeight="{TemplateBinding MinHeight}"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{StaticResource CornerRadius.Pill}"
+              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                    Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                ContentSource="Header"
+                                RecognizesAccessKey="True" />
+            </Border>
+          </Grid>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
               <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource Brush.Theme.State.HoverBackground}" />
-              <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextSecondary}" />
+              <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource Brush.Theme.State.HoverOverlay}" />
+              <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-              <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource Brush.Theme.SurfaceBackground}" />
-              <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource Brush.Theme.Border}" />
+              <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource Brush.Theme.Chat.RoleBadgeBackground}" />
+              <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource Brush.Theme.Accent}" />
               <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+              <Setter Property="FontWeight" Value="{StaticResource FontWeight.SemiBold}" />
+              <Setter Property="Panel.ZIndex" Value="10" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource Brush.Theme.State.FocusRing}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter TargetName="TabBorder" Property="Opacity" Value="{StaticResource Opacity.Disabled}" />

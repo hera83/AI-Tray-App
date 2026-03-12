@@ -9,7 +9,7 @@
         ResizeMode="NoResize"
         WindowStyle="None"
         AllowsTransparency="True"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="Manual"
         Background="Transparent">
 
     <Window.Resources>
@@ -216,6 +216,7 @@
                 <DataTrigger Binding="{Binding Role}" Value="User">
                     <Setter TargetName="MessageRow" Property="Margin" Value="{StaticResource Thickness.Chat.Row.Right}" />
                     <Setter TargetName="MessageBubble" Property="Style" Value="{StaticResource ChatUserBubbleStyle}" />
+                    <Setter TargetName="MessageBubble" Property="HorizontalAlignment" Value="Right" />
                     <Setter TargetName="MessageTimestamp" Property="HorizontalAlignment" Value="Right" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsStreaming}" Value="True">

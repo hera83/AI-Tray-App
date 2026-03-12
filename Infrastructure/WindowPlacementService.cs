@@ -2,12 +2,13 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace TrayApp.Infrastructure
 {
     /// <summary>
-    /// Persists and restores the main window's position, size and maximized state.
-    /// Falls back to a centered default if the saved placement is invalid or off-screen.
+    /// Persists the main window placement, but always restores startup position near the bottom-right.
+    /// Saved size/state can still be reused when relevant, while startup ignores the last saved x/y.
     /// </summary>
     public class WindowPlacementService
     {
@@ -16,6 +17,8 @@ namespace TrayApp.Infrastructure
         private record PlacementRecord(double Left, double Top, double Width, double Height, string State);
 
         private const double MinDimension  = 200;
+        private const double DefaultRightMargin = 20;
+    private const double DefaultBottomMargin = 20;
 
         public WindowPlacementService(string path) => _path = path;
 
@@ -38,6 +41,8 @@ namespace TrayApp.Infrastructure
 
         public void Restore(Window window)
         {
+            window.WindowStartupLocation = WindowStartupLocation.Manual;
+
             PlacementRecord? rec = null;
             try
             {
@@ -46,13 +51,10 @@ namespace TrayApp.Infrastructure
             }
             catch { }
 
-            if (rec != null && IsPlacementValid(rec))
+            if (rec != null)
             {
-                window.Left        = rec.Left;
-                window.Top         = rec.Top;
-
                 var isFixedSizeWindow = window.ResizeMode == ResizeMode.NoResize;
-                if (!isFixedSizeWindow)
+                if (!isFixedSizeWindow && IsSizeValid(rec))
                 {
                     window.Width  = rec.Width;
                     window.Height = rec.Height;
@@ -64,30 +66,14 @@ namespace TrayApp.Infrastructure
 
                 window.WindowState = restoredState;
             }
-            else
-            {
-                ApplyDefaultPlacement(window);
-            }
+
+            // Always open in the bottom-right corner on startup instead of reusing the last saved x/y position.
+            ApplyDefaultPlacement(window);
         }
 
-        private static bool IsPlacementValid(PlacementRecord r)
+        private static bool IsSizeValid(PlacementRecord r)
         {
-            if (r.Width < MinDimension || r.Height < MinDimension) return false;
-
-            // virtual screen spans all monitors
-            double vsLeft   = SystemParameters.VirtualScreenLeft;
-            double vsTop    = SystemParameters.VirtualScreenTop;
-            double vsRight  = vsLeft + SystemParameters.VirtualScreenWidth;
-            double vsBottom = vsTop  + SystemParameters.VirtualScreenHeight;
-
-            // require at least part of the title bar to be visible (40px strip)
-            const double titleBarStrip = 40;
-            bool leftOk   = r.Left + r.Width > vsLeft + titleBarStrip;
-            bool topOk    = r.Top >= vsTop;
-            bool rightOk  = r.Left < vsRight - titleBarStrip;
-            bool bottomOk = r.Top  < vsBottom;
-
-            return leftOk && topOk && rightOk && bottomOk;
+            return r.Width >= MinDimension && r.Height >= MinDimension;
         }
 
         private static void ApplyDefaultPlacement(Window window)
@@ -98,7 +84,18 @@ namespace TrayApp.Infrastructure
             if (double.IsNaN(window.Height) || window.Height < MinDimension)
                 window.Height = MinDimension * 2;
 
-            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            var screen = Screen.FromPoint(Control.MousePosition);
+            var workArea = screen.WorkingArea;
+            var x = workArea.Right - window.Width - DefaultRightMargin;
+            var y = workArea.Bottom - window.Height - DefaultBottomMargin;
+
+            x = Math.Max(workArea.Left, Math.Min(x, workArea.Right - window.Width));
+            y = Math.Max(workArea.Top, Math.Min(y, workArea.Bottom - window.Height));
+
+            window.Left = x;
+            window.Top = y;
+
+            window.WindowStartupLocation = WindowStartupLocation.Manual;
             window.WindowState = WindowState.Normal;
         }
     }
