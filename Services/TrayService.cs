@@ -16,7 +16,6 @@ namespace TrayApp.Services
         private DateTime _lastAutoHideUtc;
 
         public event Action? ShowRequested;
-        public event Action? NewChatRequested;
         public event Action? SettingsRequested;
         public event Action? ExitRequested;
         public event Action? MainHidden;
@@ -34,14 +33,6 @@ namespace TrayApp.Services
                 : SystemIcons.Application;
 
             var menu = new ContextMenuStrip();
-
-            var show = new ToolStripMenuItem("Åbn");
-            show.Click += (_, __) => { ShowRequested?.Invoke(); ShowMain(); };
-            menu.Items.Add(show);
-
-            var newChat = new ToolStripMenuItem("Ny chat");
-            newChat.Click += (_, __) => NewChatRequested?.Invoke();
-            menu.Items.Add(newChat);
 
             var settings = new ToolStripMenuItem("Indstillinger");
             settings.Click += (_, __) => SettingsRequested?.Invoke();

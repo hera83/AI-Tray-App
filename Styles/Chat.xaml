@@ -106,6 +106,17 @@
     <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Chat.Message.UserForeground}" />
   </Style>
 
+  <Style x:Key="ChatMarkdownViewerStyle" TargetType="FlowDocumentScrollViewer">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="IsToolBarVisible" Value="False" />
+    <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="Focusable" Value="False" />
+  </Style>
+
   <Style x:Key="ChatRoleBadgeStyle" TargetType="Border">
     <Setter Property="Background" Value="{DynamicResource Brush.Theme.Chat.RoleBadgeBackground}" />
     <Setter Property="CornerRadius" Value="{StaticResource CornerRadius.Pill}" />

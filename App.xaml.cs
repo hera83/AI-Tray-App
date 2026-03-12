@@ -1,5 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using TrayApp.Services;
@@ -37,6 +40,8 @@ namespace TrayApp
                 var placementService = new WindowPlacementService(Path.Combine(baseDir, "window.json"));
                 _chatServiceDisposable = chatService as IDisposable;
 
+                _ = SyncAvailableModelsOnStartupAsync(settingsService, chatService);
+
                 var main = new Views.MainWindow();
                 ApplyAppIcon(main);
                 MainWindow = main;
@@ -52,17 +57,11 @@ namespace TrayApp
                 main.StateChanged += (_, __) => placementService.Save(main);
 
                 _trayService = new TrayService(main);
-
-                _trayService.NewChatRequested += () => main.Dispatcher.Invoke(() =>
-                {
-                    vm.NewChatCommand.Execute(null);
-                    main.ActivateAndFocusInput();
-                });
                 _trayService.MainHidden += () => main.Dispatcher.Invoke(() => vm.ResetForNextOpen());
-                _trayService.SettingsRequested += () => main.Dispatcher.Invoke(() => ShowSettingsWindow(main, settingsService, _themeManager, _logger));
+                _trayService.SettingsRequested += () => main.Dispatcher.Invoke(() => ShowSettingsWindow(main, settingsService, chatService, _themeManager, _logger));
                 _trayService.ShowRequested += () => main.Dispatcher.Invoke(() => main.ActivateAndFocusInput());
 
-                vm.SettingsRequested += () => main.Dispatcher.Invoke(() => ShowSettingsWindow(main, settingsService, _themeManager, _logger));
+                vm.SettingsRequested += () => main.Dispatcher.Invoke(() => ShowSettingsWindow(main, settingsService, chatService, _themeManager, _logger));
                 vm.ResponseCompleted += responseText =>
                 {
                     main.Dispatcher.Invoke(() =>
@@ -136,7 +135,7 @@ namespace TrayApp
             };
         }
 
-        private static void ShowSettingsWindow(Window owner, ISettingsService settingsService, IThemeManager themeManager, IAppLogger logger)
+        private static void ShowSettingsWindow(Window owner, ISettingsService settingsService, IChatService chatService, IThemeManager themeManager, IAppLogger logger)
         {
             var window = new Views.SettingsWindow
             {
@@ -147,7 +146,7 @@ namespace TrayApp
             if (window.Icon == null)
                 ApplyAppIcon(window);
 
-            var vm = new SettingsViewModel(settingsService, themeManager, logger);
+            var vm = new SettingsViewModel(settingsService, chatService, themeManager, logger);
             vm.CloseRequested += saved =>
             {
                 if (saved)
@@ -180,6 +179,50 @@ namespace TrayApp
             catch
             {
                 // best-effort icon assignment
+            }
+        }
+
+        private async Task SyncAvailableModelsOnStartupAsync(ISettingsService settingsService, IChatService chatService)
+        {
+            try
+            {
+                var settings = settingsService.Settings;
+                if (string.IsNullOrWhiteSpace(settings.AiEndpoint) || string.IsNullOrWhiteSpace(settings.ApiKey))
+                    return;
+
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                var models = await chatService.GetAvailableModelsAsync(cts.Token).ConfigureAwait(false);
+                var normalizedModels = models
+                    .Where(modelName => !string.IsNullOrWhiteSpace(modelName))
+                    .Select(modelName => modelName.Trim())
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+
+                if (normalizedModels.Length == 0)
+                    return;
+
+                settings.CachedModels = normalizedModels;
+
+                if (string.IsNullOrWhiteSpace(settings.Model) ||
+                    !normalizedModels.Any(modelName => string.Equals(modelName, settings.Model, StringComparison.OrdinalIgnoreCase)))
+                {
+                    settings.Model = normalizedModels[0];
+                }
+
+                settingsService.Save();
+                _logger?.LogInfo($"Model-liste opdateret ved startup ({normalizedModels.Length} modeller). Valgt model: {settings.Model}.");
+            }
+            catch (OperationCanceledException)
+            {
+                _logger?.LogWarning("Model-liste opdatering ved startup timed out.");
+            }
+            catch (ChatServiceException ex)
+            {
+                _logger?.LogWarning($"Kunne ikke opdatere model-liste ved startup: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError("Uventet fejl under model-liste opdatering ved startup.", ex);
             }
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace TrayApp.Behaviors
 {
@@ -31,14 +32,36 @@ namespace TrayApp.Behaviors
                 if ((bool)e.NewValue)
                 {
                     sv.ScrollChanged += Sv_ScrollChanged;
+                    sv.PreviewMouseWheel += Sv_PreviewMouseWheel;
                     // initialize
                     UpdateIsNearBottom(sv);
                 }
                 else
                 {
                     sv.ScrollChanged -= Sv_ScrollChanged;
+                    sv.PreviewMouseWheel -= Sv_PreviewMouseWheel;
                 }
             }
+        }
+
+        private static void Sv_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (sender is not ScrollViewer sv)
+                return;
+
+            if (sv.ExtentHeight <= sv.ViewportHeight)
+                return;
+
+            var linesPerNotch = SystemParameters.WheelScrollLines;
+            if (linesPerNotch <= 0)
+                return;
+
+            var pixelDelta = (e.Delta / 120.0) * linesPerNotch * 16.0;
+            var maxOffset = Math.Max(0, sv.ExtentHeight - sv.ViewportHeight);
+            var targetOffset = Math.Max(0, Math.Min(maxOffset, sv.VerticalOffset - pixelDelta));
+
+            sv.ScrollToVerticalOffset(targetOffset);
+            e.Handled = true;
         }
 
         private static void Sv_ScrollChanged(object sender, ScrollChangedEventArgs e)

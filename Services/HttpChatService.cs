@@ -55,7 +55,8 @@ namespace TrayApp.Services
 
             var protocol = DetectEndpointProtocol(endpointUri);
             var requestUri = ResolveRequestUri(endpointUri, protocol);
-            var messages = BuildMessages(prompt, settings.SystemPrompt);
+            var effectiveSystemPrompt = BuildEffectiveSystemPrompt(settings);
+            var messages = BuildMessages(prompt, effectiveSystemPrompt);
             var payload = protocol == EndpointProtocol.OllamaChat
                 ? SerializeOllamaRequest(settings, messages)
                 : SerializeOpenAiRequest(settings, messages);
@@ -86,6 +87,49 @@ namespace TrayApp.Services
                 yield return chunk;
         }
 
+        public async Task<IReadOnlyList<string>> GetAvailableModelsAsync(CancellationToken cancellationToken)
+        {
+            var settings = _settings.Settings;
+            if (string.IsNullOrWhiteSpace(settings.AiEndpoint))
+                throw new ChatServiceException(
+                    ChatServiceErrorKind.Configuration,
+                    "AI endpoint er ikke konfigureret. Åbn Indstillinger og angiv en base URL.");
+
+            if (!Uri.TryCreate(settings.AiEndpoint, UriKind.Absolute, out var endpointUri))
+                throw new ChatServiceException(
+                    ChatServiceErrorKind.Configuration,
+                    "AI endpoint er ugyldigt. Kontrollér URL'en i Indstillinger.");
+
+            if (!NetworkInterface.GetIsNetworkAvailable())
+                throw new ChatServiceException(
+                    ChatServiceErrorKind.Connection,
+                    "Ingen netværksforbindelse fundet. Kontrollér internetforbindelsen og prøv igen.");
+
+            var protocol = DetectEndpointProtocol(endpointUri);
+            var requestUri = ResolveModelsRequestUri(endpointUri, protocol);
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            ApplyAuthentication(request, settings.ApiKey, protocol);
+
+            _logger.LogInfo($"Henter model-liste fra {requestUri.Host}{requestUri.AbsolutePath} (protocol={protocol}).");
+            using var response = await SendAsync(request, useStreaming: false, cancellationToken).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                throw CreateHttpFailure((int)response.StatusCode, body);
+            }
+
+            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var models = ParseModelNames(json, protocol);
+            if (models.Count == 0)
+                throw new ChatServiceException(
+                    ChatServiceErrorKind.Server,
+                    "Gatewayen returnerede ingen modeller.");
+
+            return models;
+        }
+
         public void Dispose()
         {
             _http.Dispose();
@@ -100,6 +144,52 @@ namespace TrayApp.Services
 
             messages.Add(new AiMessage { Role = "user", Content = prompt });
             return messages;
+        }
+
+        private static string? BuildEffectiveSystemPrompt(AppSettings settings)
+        {
+            var trimmedSystemPrompt = string.IsNullOrWhiteSpace(settings.SystemPrompt)
+                ? null
+                : settings.SystemPrompt.Trim();
+
+            var userMetadataLines = BuildUserMetadataLines(settings);
+            if (userMetadataLines.Count == 0)
+                return trimmedSystemPrompt;
+
+            var userContextBlock =
+                "Brugerprofil:\n- " +
+                string.Join("\n- ", userMetadataLines) +
+                "\n\nBrug kun brugerprofilen, når det er relevant for brugerens forespørgsel, så svarene kan blive mere personlige uden at antage unødige detaljer.";
+
+            if (trimmedSystemPrompt == null)
+                return userContextBlock;
+
+            return trimmedSystemPrompt + "\n\n" + userContextBlock;
+        }
+
+        private static List<string> BuildUserMetadataLines(AppSettings settings)
+        {
+            var lines = new List<string>();
+
+            AddUserMetadataLine(lines, "Fulde navn", settings.UserFullName);
+            AddUserMetadataLine(lines, "Foretrukket navn", settings.UserPreferredName);
+            AddUserMetadataLine(lines, "Rolle/arbejde", settings.UserOccupation);
+            AddUserMetadataLine(lines, "Interesser/fokus", settings.UserInterests);
+            AddUserMetadataLine(lines, "Foretrukken svarstil", settings.UserResponseStyle);
+            AddUserMetadataLine(lines, "Ekstra kontekst", settings.UserAdditionalContext);
+
+            if (lines.Count == 0)
+                AddUserMetadataLine(lines, "Ekstra kontekst", settings.UserProfile);
+
+            return lines;
+        }
+
+        private static void AddUserMetadataLine(List<string> lines, string label, string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+
+            lines.Add($"{label}: {value.Trim()}");
         }
 
         private string SerializeOpenAiRequest(AppSettings settings, List<AiMessage> messages)
@@ -272,6 +362,81 @@ namespace TrayApp.Services
                 return new Uri(endpointUri, "/v1/ollama/api/chat");
 
             return endpointUri;
+        }
+
+        private static Uri ResolveModelsRequestUri(Uri endpointUri, EndpointProtocol protocol)
+        {
+            if (protocol == EndpointProtocol.OllamaChat)
+                return new Uri(endpointUri, "/v1/ollama/api/tags");
+
+            var path = endpointUri.AbsolutePath.Trim();
+            if (string.IsNullOrWhiteSpace(path) || path == "/")
+                return new Uri(endpointUri, "/v1/models");
+
+            if (path.Contains("/chat/completions", StringComparison.OrdinalIgnoreCase))
+                return new Uri(endpointUri, "/v1/models");
+
+            if (path.Contains("/models", StringComparison.OrdinalIgnoreCase))
+                return endpointUri;
+
+            return new Uri(endpointUri, "/v1/models");
+        }
+
+        private static IReadOnlyList<string> ParseModelNames(string json, EndpointProtocol protocol)
+        {
+            var models = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            using var document = JsonDocument.Parse(json);
+            var root = document.RootElement;
+
+            if (protocol == EndpointProtocol.OllamaChat)
+            {
+                if (!root.TryGetProperty("models", out var ollamaModels) || ollamaModels.ValueKind != JsonValueKind.Array)
+                    return models;
+
+                foreach (var item in ollamaModels.EnumerateArray())
+                {
+                    AddModelCandidate(item, "model", seen, models);
+                    AddModelCandidate(item, "name", seen, models);
+                }
+
+                return models;
+            }
+
+            if (root.TryGetProperty("data", out var openAiData) && openAiData.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in openAiData.EnumerateArray())
+                    AddModelCandidate(item, "id", seen, models);
+
+                return models;
+            }
+
+            if (!root.TryGetProperty("models", out var genericModels) || genericModels.ValueKind != JsonValueKind.Array)
+                return models;
+
+            foreach (var item in genericModels.EnumerateArray())
+            {
+                AddModelCandidate(item, "id", seen, models);
+                AddModelCandidate(item, "model", seen, models);
+                AddModelCandidate(item, "name", seen, models);
+            }
+
+            return models;
+        }
+
+        private static void AddModelCandidate(JsonElement item, string propertyName, HashSet<string> seen, List<string> models)
+        {
+            if (!item.TryGetProperty(propertyName, out var modelProperty) || modelProperty.ValueKind != JsonValueKind.String)
+                return;
+
+            var value = modelProperty.GetString();
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+
+            var normalized = value.Trim();
+            if (seen.Add(normalized))
+                models.Add(normalized);
         }
 
         private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, bool useStreaming, CancellationToken cancellationToken)

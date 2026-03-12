@@ -3,14 +3,85 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behaviors="clr-namespace:TrayApp.Behaviors"
     xmlns:converters="clr-namespace:TrayApp.Converters"
-        Title="Tray AI Chat"
+        Title="AI Assistent"
         Height="{StaticResource Size.Window.Main.Height}"
         Width="{StaticResource Size.Window.Main.Width}"
+        ResizeMode="NoResize"
         Background="{DynamicResource Brush.Theme.WindowBackground}">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter" />
+        <converters:MarkdownMessageToFlowDocumentConverter x:Key="MarkdownMessageToFlowDocumentConverter" />
+
+        <DataTemplate x:Key="ChatMessageTemplate">
+            <Grid x:Name="MessageRow" Margin="{StaticResource Thickness.Chat.Row.Left}">
+                <StackPanel>
+                    <Border x:Name="MessageBubble" Style="{StaticResource ChatAssistantBubbleStyle}" Margin="{StaticResource Thickness.Chat.Bubble.Left}">
+                        <StackPanel>
+                            <FlowDocumentScrollViewer x:Name="MessageMarkdown"
+                                                      Document="{Binding Content, Converter={StaticResource MarkdownMessageToFlowDocumentConverter}}"
+                                                      Style="{StaticResource ChatMarkdownViewerStyle}"
+                                                      Visibility="{Binding Content, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                            </FlowDocumentScrollViewer>
+
+                            <StackPanel x:Name="TypingIndicator" Orientation="Horizontal" Visibility="Collapsed">
+                                <Ellipse Style="{StaticResource ChatTypingDotStyle}">
+                                    <Ellipse.Triggers>
+                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Ellipse.Triggers>
+                                </Ellipse>
+                                <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
+                                    <Ellipse.Triggers>
+                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.15">
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Ellipse.Triggers>
+                                </Ellipse>
+                                <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
+                                    <Ellipse.Triggers>
+                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.3">
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Ellipse.Triggers>
+                                </Ellipse>
+                                <TextBlock Text="AI skriver..." Style="{StaticResource CaptionStyle}" Margin="{StaticResource Thickness.Inline.Left.10}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock x:Name="MessageTimestamp"
+                               Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy · HH:mm}'}"
+                               Style="{StaticResource ChatTimestampTextStyle}"
+                               Margin="{StaticResource Thickness.Chat.Timestamp}"
+                               HorizontalAlignment="Left" />
+                </StackPanel>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Role}" Value="User">
+                    <Setter TargetName="MessageRow" Property="Margin" Value="{StaticResource Thickness.Chat.Row.Right}" />
+                    <Setter TargetName="MessageBubble" Property="Style" Value="{StaticResource ChatUserBubbleStyle}" />
+                    <Setter TargetName="MessageTimestamp" Property="HorizontalAlignment" Value="Right" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsStreaming}" Value="True">
+                    <Setter TargetName="TypingIndicator" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -84,30 +155,13 @@
                                     <TextBlock Text="{Binding UpdatedAt, StringFormat='{}{0:dd.MM.yyyy \u00b7 HH:mm}'}" FontSize="{StaticResource FontSize.Caption}" Margin="{StaticResource Thickness.Margin.Top.2}" Opacity="0.9" />
                                 </StackPanel>
                                 <Button Grid.Column="1"
-                                        Content="\u00d7"
+                                        Content="Slet"
                                         Command="{Binding DataContext.DeleteSessionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}"
                                         VerticalAlignment="Center"
-                                        Width="22" Height="22"
-                                        ToolTip="Slet samtale">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Setter Property="BorderThickness" Value="0" />
-                                            <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextSecondary}" />
-                                            <Setter Property="FontSize" Value="14" />
-                                            <Setter Property="Padding" Value="0" />
-                                            <Setter Property="Opacity" Value="0.5" />
-                                            <Setter Property="Cursor" Value="Hand" />
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Feedback.Error}" />
-                                                    <Setter Property="Opacity" Value="1" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
+                                        Margin="{StaticResource Thickness.Margin.Left.6}"
+                                        ToolTip="Slet samtale"
+                                        Style="{StaticResource SecondaryButtonStyle}" />
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -140,80 +194,15 @@
                                   behaviors:ScrollViewerBehavior.Monitor="True"
                                   behaviors:ScrollViewerBehavior.IsNearBottom="{Binding IsUserNearBottom, Mode=TwoWay}"
                                   behaviors:ScrollViewerBehavior.ScrollToBottomTrigger="{Binding ScrollToBottomRequest}">
-                        <ItemsControl ItemsSource="{Binding Messages}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid x:Name="MessageRow" Margin="{StaticResource Thickness.Chat.Row.Left}">
-                                <StackPanel>
-                                    <Border x:Name="MessageBubble" Style="{StaticResource ChatAssistantBubbleStyle}" Margin="{StaticResource Thickness.Chat.Bubble.Left}">
-                                        <StackPanel>
-                                            <TextBlock x:Name="MessageText" Text="{Binding Content}" Style="{StaticResource ChatMessageTextStyle}" Visibility="{Binding Content, Converter={StaticResource NullOrEmptyToVisibilityConverter}}" />
-
-                                            <StackPanel x:Name="TypingIndicator" Orientation="Horizontal" Visibility="Collapsed">
-                                                <Ellipse Style="{StaticResource ChatTypingDotStyle}">
-                                                    <Ellipse.Triggers>
-                                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                                            <BeginStoryboard>
-                                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
-                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
-                                                                </Storyboard>
-                                                            </BeginStoryboard>
-                                                        </EventTrigger>
-                                                    </Ellipse.Triggers>
-                                                </Ellipse>
-                                                <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
-                                                    <Ellipse.Triggers>
-                                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                                            <BeginStoryboard>
-                                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.15">
-                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
-                                                                </Storyboard>
-                                                            </BeginStoryboard>
-                                                        </EventTrigger>
-                                                    </Ellipse.Triggers>
-                                                </Ellipse>
-                                                <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
-                                                    <Ellipse.Triggers>
-                                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                                            <BeginStoryboard>
-                                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.3">
-                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
-                                                                </Storyboard>
-                                                            </BeginStoryboard>
-                                                        </EventTrigger>
-                                                    </Ellipse.Triggers>
-                                                </Ellipse>
-                                                <TextBlock Text="AI skriver..." Style="{StaticResource CaptionStyle}" Margin="{StaticResource Thickness.Inline.Left.10}" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </Border>
-
-                                    <TextBlock x:Name="MessageTimestamp"
-                                               Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy · HH:mm}'}"
-                                               Style="{StaticResource ChatTimestampTextStyle}"
-                                               Margin="{StaticResource Thickness.Chat.Timestamp}"
-                                               HorizontalAlignment="Left" />
-                                </StackPanel>
-                            </Grid>
-                            <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Role}" Value="User">
-                                    <Setter TargetName="MessageRow" Property="Margin" Value="{StaticResource Thickness.Chat.Row.Right}" />
-                                    <Setter TargetName="MessageBubble" Property="Style" Value="{StaticResource ChatUserBubbleStyle}" />
-                                    <Setter TargetName="MessageText" Property="Style" Value="{StaticResource ChatMessageTextUserStyle}" />
-                                    <Setter TargetName="MessageTimestamp" Property="HorizontalAlignment" Value="Right" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsStreaming}" Value="True">
-                                    <Setter TargetName="TypingIndicator" Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding Messages}"
+                                      ItemTemplate="{StaticResource ChatMessageTemplate}" />
                 </ScrollViewer>
                     </Border>
 
                 <!-- empty state when no messages -->
-                <Border Background="Transparent" Visibility="{Binding ShowEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Border Background="Transparent"
+                        IsHitTestVisible="False"
+                        Visibility="{Binding ShowConfigurationEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid>
                         <Border Width="{StaticResource Size.Chat.EmptyStateHalo}" Height="{StaticResource Size.Chat.EmptyStateHalo}" Background="{DynamicResource Brush.Theme.Chat.EmptyStateAccent}" CornerRadius="{StaticResource CornerRadius.Circle.Halo}" Opacity="0.8" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <Border Style="{StaticResource ChatEmptyStateCardStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using TrayApp.Infrastructure;
 
@@ -25,6 +26,14 @@ namespace TrayApp.Services
         public string ApiKey       { get; set; } = string.Empty;   // never log this field
         public string Model        { get; set; } = "gpt-4o-mini";
         public string SystemPrompt { get; set; } = "You are a helpful assistant.";
+        public string UserProfile  { get; set; } = string.Empty; // legacy free-text profile
+        public string UserFullName { get; set; } = string.Empty;
+        public string UserPreferredName { get; set; } = string.Empty;
+        public string UserOccupation { get; set; } = string.Empty;
+        public string UserInterests { get; set; } = string.Empty;
+        public string UserResponseStyle { get; set; } = string.Empty;
+        public string UserAdditionalContext { get; set; } = string.Empty;
+        public string[] CachedModels { get; set; } = Array.Empty<string>();
         public double Temperature  { get; set; } = 0.7;
         public bool   UseStreaming { get; set; } = true;
 
@@ -73,6 +82,25 @@ namespace TrayApp.Services
             if (map.TryGetValue("ApiKey",                out v))     s.ApiKey                = v;
             if (map.TryGetValue("Model",                 out v))     s.Model                 = v;
             if (map.TryGetValue("SystemPrompt",          out v))     s.SystemPrompt          = v;
+            if (map.TryGetValue("UserProfile",           out v))     s.UserProfile           = v;
+            if (map.TryGetValue("UserFullName",          out v))     s.UserFullName          = v;
+            if (map.TryGetValue("UserPreferredName",     out v))     s.UserPreferredName     = v;
+            if (map.TryGetValue("UserOccupation",        out v))     s.UserOccupation        = v;
+            if (map.TryGetValue("UserInterests",         out v))     s.UserInterests         = v;
+            if (map.TryGetValue("UserResponseStyle",     out v))     s.UserResponseStyle     = v;
+            if (map.TryGetValue("UserAdditionalContext", out v))     s.UserAdditionalContext = v;
+            else if (!string.IsNullOrWhiteSpace(s.UserProfile))       s.UserAdditionalContext = s.UserProfile;
+            if (map.TryGetValue("CachedModels", out v) && !string.IsNullOrWhiteSpace(v))
+            {
+                try
+                {
+                    s.CachedModels = JsonSerializer.Deserialize<string[]>(v) ?? Array.Empty<string>();
+                }
+                catch
+                {
+                    s.CachedModels = Array.Empty<string>();
+                }
+            }
             if (map.TryGetValue("Temperature",           out v) &&
                 double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out var temp))
                                                                       s.Temperature          = temp;
@@ -96,6 +124,14 @@ namespace TrayApp.Services
                 ("ApiKey",                 s.ApiKey),
                 ("Model",                  s.Model),
                 ("SystemPrompt",           s.SystemPrompt),
+                ("UserProfile",            s.UserAdditionalContext),
+                ("UserFullName",           s.UserFullName),
+                ("UserPreferredName",      s.UserPreferredName),
+                ("UserOccupation",         s.UserOccupation),
+                ("UserInterests",          s.UserInterests),
+                ("UserResponseStyle",      s.UserResponseStyle),
+                ("UserAdditionalContext",  s.UserAdditionalContext),
+                ("CachedModels",           JsonSerializer.Serialize(s.CachedModels ?? Array.Empty<string>())),
                 ("Temperature",            s.Temperature.ToString(CultureInfo.InvariantCulture)),
                 ("UseStreaming",            s.UseStreaming.ToString()),
                 ("StartMinimizedToTray",   s.StartMinimizedToTray.ToString()),

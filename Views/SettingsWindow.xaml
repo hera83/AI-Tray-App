@@ -15,107 +15,179 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
+        <TabControl Grid.Row="0" SelectedIndex="0">
+            <TabItem Header="Bruger">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Bruger" Style="{StaticResource SectionHeaderTextStyle}"/>
+                        <Separator Style="{StaticResource PanelSeparatorStyle}"/>
 
-                <!-- ══ AI Gateway ══ -->
-                <TextBlock Text="AI Gateway" Style="{StaticResource SectionHeaderTextStyle}"/>
-                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+                        <TextBlock Text="Fulde navn" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <TextBox Text="{Binding UserFullName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}"
+                                 Margin="{StaticResource Thickness.Form.FieldBottom}"/>
 
-                <TextBlock Text="Gateway URL" Style="{StaticResource FieldLabelTextStyle}"/>
-                <TextBox Text="{Binding AiEndpoint, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource InputTextBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
-                <TextBlock Text="Du kan indsætte hele endpointet eller bare gatewayens base URL. Hvis du kun angiver hosten, bruger appen automatisk chat-routen for Ollama-gatewayen."
-                           Style="{StaticResource HelperTextStyle}"
-                           Margin="{StaticResource Thickness.Form.HelperBottom}"/>
+                        <TextBlock Text="Foretrukket navn" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <TextBox Text="{Binding UserPreferredName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}"
+                                 Margin="{StaticResource Thickness.Form.FieldBottom}"/>
 
-                <TextBlock Text="API Key" Style="{StaticResource FieldLabelTextStyle}"/>
-                <PasswordBox Margin="{StaticResource Thickness.Form.HelperTop}"
-                             Style="{StaticResource InputPasswordBoxStyle}"
-                             behaviors:PasswordBoxAssistant.BindPassword="True"
-                             behaviors:PasswordBoxAssistant.BoundPassword="{Binding ApiKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Gemt lokalt og sendt som den auth-header din gateway forventer. Vis aldrig nøglen i logfiler eller screenshots."
-                           Style="{StaticResource HelperTextStyle}"
-                           Margin="{StaticResource Thickness.Form.HelperBottom}"/>
+                        <TextBlock Text="Rolle / arbejde" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <TextBox Text="{Binding UserOccupation, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}"
+                                 Margin="{StaticResource Thickness.Form.FieldBottom}"/>
 
-                <TextBlock Text="Model" Style="{StaticResource FieldLabelTextStyle}"/>
-                <TextBox Text="{Binding Model, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource InputTextBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+                        <TextBlock Text="Interesser og fokusområder" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <TextBox Text="{Binding UserInterests, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}"
+                                 AcceptsReturn="True"
+                                 Height="{StaticResource Size.Input.MultilineHeight}"
+                                 VerticalScrollBarVisibility="Auto"
+                                 TextWrapping="Wrap"
+                                 Margin="{StaticResource Thickness.Form.FieldBottom}"/>
 
-                <!-- ══ Chat ══ -->
-                <TextBlock Text="Chat" Style="{StaticResource SectionHeaderTextStyle}"/>
-                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+                        <TextBlock Text="Foretrukken svarstil (valgfri)" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <ComboBox ItemsSource="{Binding AvailableResponseStyles}"
+                                  SelectedItem="{Binding UserResponseStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="{StaticResource Thickness.Form.FieldBottom}"/>
 
-                <TextBlock Text="System prompt" Style="{StaticResource FieldLabelTextStyle}"/>
-                <TextBox Text="{Binding SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource InputTextBoxStyle}" AcceptsReturn="True" Height="{StaticResource Size.Input.MultilineHeight}"
-                         VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+                        <TextBlock Text="Ekstra kontekst" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <TextBox Text="{Binding UserAdditionalContext, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}"
+                                 AcceptsReturn="True"
+                                 Height="{StaticResource Size.Input.MultilineHeight}"
+                                 VerticalScrollBarVisibility="Auto"
+                                 TextWrapping="Wrap"
+                                 Margin="{StaticResource Thickness.Form.FieldBottom}"/>
 
-                <Grid Margin="{StaticResource Thickness.Form.FieldBottom}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Temperature" Style="{StaticResource FieldLabelTextStyle}"/>
-                        <Slider Minimum="0" Maximum="2" TickFrequency="0.1" IsSnapToTickEnabled="True"
-                            Value="{Binding Temperature}" Foreground="{DynamicResource Brush.Theme.Accent}"/>
+                        <TextBlock Text="De her felter bruges som frivillig brugerprofil, så svar kan tilpasses mere personligt, når det er relevant."
+                                   Style="{StaticResource HelperTextStyle}"
+                                   Margin="{StaticResource Thickness.Form.HelperBottom}"/>
                     </StackPanel>
-                    <TextBlock Grid.Column="1" Text="{Binding Temperature, StringFormat='{}{0:F1}'}"
-                               Style="{StaticResource BodyStyle}"
-                               VerticalAlignment="Bottom" Margin="{StaticResource Thickness.Margin.Left.12}"/>
-                </Grid>
+                </ScrollViewer>
+            </TabItem>
 
-                <CheckBox Content="Brug streaming (server-sent events)"
-                          IsChecked="{Binding UseStreaming}"
-                          Style="{StaticResource ModernCheckBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+            <TabItem Header="Config">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
 
-                <!-- \u2550\u2550 Data \u2550\u2550 -->
-                <TextBlock Text="Data" Style="{StaticResource SectionHeaderTextStyle}"/>
-                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+                        <!-- ══ AI Gateway ══ -->
+                        <TextBlock Text="AI Gateway" Style="{StaticResource SectionHeaderTextStyle}"/>
+                        <Separator Style="{StaticResource PanelSeparatorStyle}"/>
 
-                <TextBlock Text="Slet alle samtaler" Style="{StaticResource FieldLabelTextStyle}"/>
-                <Button Content="Slet alle samtaler"
-                        Command="{Binding DeleteAllChatsCommand}"
-                        Style="{StaticResource SecondaryButtonStyle}"
-                        HorizontalAlignment="Left"
-                        Margin="{StaticResource Thickness.Form.FieldBottom}" />
-                <TextBlock Text="Sletter al chat-historik permanent. Appen starter med en ny tom samtale."
-                           Style="{StaticResource HelperTextStyle}"
-                           Margin="{StaticResource Thickness.Form.HelperBottom}"/>
+                        <TextBlock Text="Gateway URL" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <TextBox Text="{Binding AiEndpoint, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+                        <TextBlock Text="Du kan indsætte hele endpointet eller bare gatewayens base URL. Hvis du kun angiver hosten, bruger appen automatisk chat-routen for Ollama-gatewayen."
+                                   Style="{StaticResource HelperTextStyle}"
+                                   Margin="{StaticResource Thickness.Form.HelperBottom}"/>
 
-                <!-- ══ App ══ -->
-                <TextBlock Text="App" Style="{StaticResource SectionHeaderTextStyle}"/>
-                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+                        <TextBlock Text="API Key" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <PasswordBox Margin="{StaticResource Thickness.Form.HelperTop}"
+                                     Style="{StaticResource InputPasswordBoxStyle}"
+                                     behaviors:PasswordBoxAssistant.BindPassword="True"
+                                     behaviors:PasswordBoxAssistant.BoundPassword="{Binding ApiKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Gemt lokalt og sendt som den auth-header din gateway forventer. Vis aldrig nøglen i logfiler eller screenshots."
+                                   Style="{StaticResource HelperTextStyle}"
+                                   Margin="{StaticResource Thickness.Form.HelperBottom}"/>
 
-                <CheckBox Content="Start minimeret til system tray"
-                          IsChecked="{Binding StartMinimizedToTray}"
-                          Style="{StaticResource ModernCheckBoxStyle}"/>
+                        <TextBlock Text="Model" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <Grid Margin="{StaticResource Thickness.Form.FieldBottom}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                <CheckBox Content="Start app ved Windows-opstart"
-                          IsChecked="{Binding LaunchOnWindowsStartup}"
-                          Style="{StaticResource ModernCheckBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+                            <ComboBox Grid.Column="0"
+                                      ItemsSource="{Binding AvailableModels}"
+                                      SelectedItem="{Binding Model, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Text="Theme" Style="{StaticResource FieldLabelTextStyle}"/>
-                <ComboBox ItemsSource="{Binding AvailableThemeModes}"
-                          SelectedItem="{Binding SelectedThemeMode}"
-                          Margin="{StaticResource Thickness.Form.HelperTop}" />
-                <TextBlock Text="Vælg mellem et lyst eller mørkt udtryk. Appen opdateres, når du gemmer."
-                           Style="{StaticResource HelperTextStyle}"
-                           Margin="{StaticResource Thickness.Form.HelperBottom}"/>
+                            <Button Grid.Column="1"
+                                    Content="Opdater"
+                                    Command="{Binding RefreshModelsCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="{StaticResource Thickness.Margin.Left.6}"/>
+                        </Grid>
+                        <TextBlock Text="Modeller hentes fra AI gatewayen. Den valgte model bruges som standardmodel i appen."
+                                   Style="{StaticResource HelperTextStyle}"
+                                   Margin="{StaticResource Thickness.Form.HelperBottom}"/>
 
-                <TextBlock Text="Om appen" Style="{StaticResource SectionHeaderTextStyle}"/>
-                <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+                        <!-- ══ Chat ══ -->
+                        <TextBlock Text="Chat" Style="{StaticResource SectionHeaderTextStyle}"/>
+                        <Separator Style="{StaticResource PanelSeparatorStyle}"/>
 
-                <TextBlock Text="Version" Style="{StaticResource FieldLabelTextStyle}"/>
-                <TextBlock Text="{Binding AppVersion}" Style="{StaticResource BodyStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+                        <TextBlock Text="System prompt" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <TextBox Text="{Binding SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}" AcceptsReturn="True" Height="{StaticResource Size.Input.MultilineHeight}"
+                                 VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
 
-                <TextBlock Text="Logfil" Style="{StaticResource FieldLabelTextStyle}"/>
-                <TextBlock Text="{Binding LogFilePath}" Style="{StaticResource SecondaryBodyTextStyle}" TextWrapping="Wrap" Margin="{StaticResource Thickness.Form.HelperBottomSmall}"/>
-                <TextBlock Text="Loggen bruges til lokale fejl og startup-hændelser." Style="{StaticResource MutedBodyTextStyle}" />
+                        <Grid Margin="{StaticResource Thickness.Form.FieldBottom}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Temperature" Style="{StaticResource FieldLabelTextStyle}"/>
+                                <Slider Minimum="0" Maximum="2" TickFrequency="0.1" IsSnapToTickEnabled="True"
+                                    Value="{Binding Temperature}" Foreground="{DynamicResource Brush.Theme.Accent}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{Binding Temperature, StringFormat='{}{0:F1}'}"
+                                       Style="{StaticResource BodyStyle}"
+                                       VerticalAlignment="Bottom" Margin="{StaticResource Thickness.Margin.Left.12}"/>
+                        </Grid>
 
-            </StackPanel>
-        </ScrollViewer>
+                        <CheckBox Content="Brug streaming (server-sent events)"
+                                  IsChecked="{Binding UseStreaming}"
+                                  Style="{StaticResource ModernCheckBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                        <!-- \u2550\u2550 Data \u2550\u2550 -->
+                        <TextBlock Text="Data" Style="{StaticResource SectionHeaderTextStyle}"/>
+                        <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+
+                        <TextBlock Text="Slet alle samtaler" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <Button Content="Slet alle samtaler"
+                                Command="{Binding DeleteAllChatsCommand}"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                HorizontalAlignment="Left"
+                                Margin="{StaticResource Thickness.Form.FieldBottom}" />
+                        <TextBlock Text="Sletter al chat-historik permanent. Appen starter med en ny tom samtale."
+                                   Style="{StaticResource HelperTextStyle}"
+                                   Margin="{StaticResource Thickness.Form.HelperBottom}"/>
+
+                        <!-- ══ App ══ -->
+                        <TextBlock Text="App" Style="{StaticResource SectionHeaderTextStyle}"/>
+                        <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+
+                        <CheckBox Content="Start minimeret til system tray"
+                                  IsChecked="{Binding StartMinimizedToTray}"
+                                  Style="{StaticResource ModernCheckBoxStyle}"/>
+
+                        <CheckBox Content="Start app ved Windows-opstart"
+                                  IsChecked="{Binding LaunchOnWindowsStartup}"
+                                  Style="{StaticResource ModernCheckBoxStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                        <TextBlock Text="Theme" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <ComboBox ItemsSource="{Binding AvailableThemeModes}"
+                                  SelectedItem="{Binding SelectedThemeMode}"
+                                  Margin="{StaticResource Thickness.Form.HelperTop}" />
+                        <TextBlock Text="Vælg mellem et lyst eller mørkt udtryk. Appen opdateres, når du gemmer."
+                                   Style="{StaticResource HelperTextStyle}"
+                                   Margin="{StaticResource Thickness.Form.HelperBottom}"/>
+
+                        <TextBlock Text="Om appen" Style="{StaticResource SectionHeaderTextStyle}"/>
+                        <Separator Style="{StaticResource PanelSeparatorStyle}"/>
+
+                        <TextBlock Text="Version" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <TextBlock Text="{Binding AppVersion}" Style="{StaticResource BodyStyle}" Margin="{StaticResource Thickness.Form.FieldBottom}"/>
+
+                        <TextBlock Text="Logfil" Style="{StaticResource FieldLabelTextStyle}"/>
+                        <TextBlock Text="{Binding LogFilePath}" Style="{StaticResource SecondaryBodyTextStyle}" TextWrapping="Wrap" Margin="{StaticResource Thickness.Form.HelperBottomSmall}"/>
+                        <TextBlock Text="Loggen bruges til lokale fejl og startup-hændelser." Style="{StaticResource MutedBodyTextStyle}" />
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
 
         <!-- Bottom bar -->
         <Grid Grid.Row="1" Margin="{StaticResource Thickness.Layout.BottomBarTop}">
