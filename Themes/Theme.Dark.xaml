@@ -6,6 +6,7 @@
     <ResourceDictionary Source="../Resources/Spacing.xaml" />
     <ResourceDictionary Source="../Resources/Corners.xaml" />
     <ResourceDictionary Source="../Resources/Typography.xaml" />
+    <ResourceDictionary Source="../Resources/Elevation.xaml" />
     <ResourceDictionary Source="../Styles/Controls.xaml" />
     <ResourceDictionary Source="../Styles/Chat.xaml" />
   </ResourceDictionary.MergedDictionaries>

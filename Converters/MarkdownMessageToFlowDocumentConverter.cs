@@ -22,7 +22,7 @@ using WpfFontFamily = System.Windows.Media.FontFamily;
 
 namespace TrayApp.Converters
 {
-    public class MarkdownMessageToFlowDocumentConverter : IValueConverter
+    public class MarkdownMessageToFlowDocumentConverter : IValueConverter, IMultiValueConverter
     {
         private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder()
             .UseAdvancedExtensions()
@@ -40,9 +40,29 @@ namespace TrayApp.Converters
             return CreateDocument(string.Empty, MessageRole.Assistant);
         }
 
+        public object Convert(object[] values, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (values is { Length: > 0 })
+            {
+                var content = values[0] as string;
+                var role = values.Length > 1 && values[1] is MessageRole messageRole
+                    ? messageRole
+                    : MessageRole.Assistant;
+
+                return CreateDocument(content, role);
+            }
+
+            return CreateDocument(string.Empty, MessageRole.Assistant);
+        }
+
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             return WpfBinding.DoNothing;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object? parameter, CultureInfo culture)
+        {
+            return Array.Empty<object>();
         }
 
         private static FlowDocument CreateDocument(string? markdown, MessageRole role)

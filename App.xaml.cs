@@ -13,6 +13,16 @@ namespace TrayApp
 {
     public partial class App : System.Windows.Application
     {
+        private static readonly string[] CriticalStartupResources =
+        {
+            "BaseTextBoxStyle",
+            "PrimaryButtonStyle",
+            "SecondaryButtonStyle",
+            "ChatBaseTextBoxStyle",
+            "RoundIconButtonStyle",
+            "ChatConversationSurfaceStyle"
+        };
+
         private TrayService? _trayService;
         private MainWindowViewModel? _mainViewModel;
         private IDisposable? _chatServiceDisposable;
@@ -30,11 +40,14 @@ namespace TrayApp
                 _logger = new FileAppLogger(Path.Combine(baseDir, "logs", "trayapp.log"));
                 RegisterGlobalExceptionHandlers();
                 _logger.LogInfo($"{AppInfo.ProductName} {AppInfo.Version} starter.");
+                LogStartupDiagnostics("Startup.Begin");
 
                 var db = new AppDatabase(Path.Combine(baseDir, "trayapp.db"));
                 ISettingsService settingsService = new SettingsService(db);
                 _themeManager = new ThemeManager(this);
+                _logger.LogInfo($"Anvender theme-mode fra settings: {settingsService.Settings.ThemeMode}");
                 _themeManager.Initialize(settingsService.Settings.ThemeMode);
+                LogStartupDiagnostics("Startup.AfterThemeInitialize");
                 IChatRepository chatRepo = new ChatRepository(db);
                 IChatService chatService = new HttpChatService(settingsService, _logger);
                 var placementService = new WindowPlacementService(Path.Combine(baseDir, "window.json"));
@@ -49,6 +62,7 @@ namespace TrayApp
                 var vm = new ViewModels.MainWindowViewModel(chatService, chatRepo, settingsService, _logger);
                 _mainViewModel = vm;
                 main.DataContext = vm;
+                LogStartupDiagnostics("Startup.AfterMainWindowConstruct");
 
                 placementService.Restore(main);
 
@@ -100,6 +114,7 @@ namespace TrayApp
             }
             catch (Exception ex)
             {
+                LogStartupDiagnostics("Startup.FatalCatch");
                 _logger?.LogError("Fatal fejl under startup.", ex);
                 System.Windows.MessageBox.Show(
                     "Appen kunne ikke starte korrekt. Se logfilen i AppData/TrayApp/logs for detaljer.",
@@ -133,6 +148,40 @@ namespace TrayApp
                 _logger?.LogError("Uobserveret task-fejl.", args.Exception);
                 args.SetObserved();
             };
+        }
+
+        private void LogStartupDiagnostics(string stage)
+        {
+            if (_logger == null)
+                return;
+
+            try
+            {
+                _logger.LogInfo($"[StartupDiagnostics] Stage={stage}");
+                _logger.LogInfo($"[StartupDiagnostics] Theme={_themeManager?.CurrentTheme.ToString() ?? "<ikke-initialiseret>"}");
+                _logger.LogInfo($"[StartupDiagnostics] AppResources: direct={Resources.Count}, merged={Resources.MergedDictionaries.Count}");
+
+                for (var index = 0; index < Resources.MergedDictionaries.Count; index++)
+                {
+                    var dictionary = Resources.MergedDictionaries[index];
+                    var source = dictionary.Source?.OriginalString ?? "<inline>";
+                    _logger.LogInfo($"[StartupDiagnostics] Merged[{index}] Source={source}, Keys={dictionary.Count}");
+                }
+
+                foreach (var resourceKey in CriticalStartupResources)
+                {
+                    var resourceValue = TryFindResource(resourceKey);
+                    var status = resourceValue == null
+                        ? "MISSING"
+                        : $"FOUND ({resourceValue.GetType().Name})";
+
+                    _logger.LogInfo($"[StartupDiagnostics] Resource '{resourceKey}': {status}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"[StartupDiagnostics] Fejl under diagnostics i stage '{stage}': {ex.Message}");
+            }
         }
 
         private static void ShowSettingsWindow(Window owner, ISettingsService settingsService, IChatService chatService, IThemeManager themeManager, IAppLogger logger)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -25,11 +26,28 @@ namespace TrayApp.ViewModels
         private bool _disposed;
         private bool _isSending;
         private bool _resetToFreshChatOnIdle;
+        private bool _isSyncingSelectedSessionModel;
         private int _sendGate;
         private CancellationTokenSource? _generationCts;
+        private readonly Dictionary<Guid, string> _sessionModelOverrides = new();
+        private string _lastKnownDefaultModel = string.Empty;
 
         public ObservableCollection<ChatMessage> Messages { get; } = new();
         public ObservableCollection<ChatSession> ChatSessions { get; } = new();
+        public ObservableCollection<string> AvailableModels { get; } = new();
+
+        private bool _isLoadingModels;
+        public bool IsLoadingModels
+        {
+            get => _isLoadingModels;
+            private set
+            {
+                if (!SetProperty(ref _isLoadingModels, value))
+                    return;
+
+                OnPropertyChanged(nameof(CanSelectModel));
+            }
+        }
 
         private bool _isUserNearBottom = true;
         public bool IsUserNearBottom
@@ -64,6 +82,7 @@ namespace TrayApp.ViewModels
 
                     NotifyEmptyStateChanged();
                     RaiseCommandStateChanged();
+                    EnsureSelectedSessionModel();
                 }
             }
         }
@@ -92,6 +111,34 @@ namespace TrayApp.ViewModels
                     EnsureDraftSessionForInput();
                     RaiseCommandStateChanged();
                 }
+            }
+        }
+
+        private string _selectedSessionModel = string.Empty;
+        public string SelectedSessionModel
+        {
+            get => _selectedSessionModel;
+            set
+            {
+                var normalized = string.IsNullOrWhiteSpace(value)
+                    ? ResolveDefaultModel()
+                    : value.Trim();
+
+                normalized = NormalizeModelToAvailable(normalized);
+
+                if (!SetProperty(ref _selectedSessionModel, normalized))
+                    return;
+
+                AddModelIfMissing(_selectedSessionModel);
+
+                if (_activeSession == null || _isSyncingSelectedSessionModel)
+                    return;
+
+                var defaultModel = ResolveDefaultModel();
+                if (string.Equals(_selectedSessionModel, defaultModel, StringComparison.OrdinalIgnoreCase))
+                    _sessionModelOverrides.Remove(_activeSession.Id);
+                else
+                    _sessionModelOverrides[_activeSession.Id] = _selectedSessionModel;
             }
         }
 
@@ -161,6 +208,7 @@ namespace TrayApp.ViewModels
             : "Åbn Indstillinger og angiv endpoint og eventuel API key for at bruge appen.";
         public bool IsEndpointConfigured => !string.IsNullOrWhiteSpace(_settings.Settings.AiEndpoint);
         public bool CanSend => !IsLoading && !IsInitializing && IsEndpointConfigured && !string.IsNullOrWhiteSpace(InputText);
+        public bool CanSelectModel => !IsInitializing && IsEndpointConfigured && AvailableModels.Count > 0 && !IsLoadingModels;
 
         public ICommand SendCommand { get; }
         public ICommand OpenSettingsCommand { get; }
@@ -180,6 +228,11 @@ namespace TrayApp.ViewModels
             _settings = settings;
             _logger = logger;
             Messages.CollectionChanged += (_, __) => NotifyEmptyStateChanged();
+            AvailableModels.CollectionChanged += (_, __) => OnPropertyChanged(nameof(CanSelectModel));
+
+            SeedAvailableModels();
+            EnsureSelectedSessionModel();
+            _lastKnownDefaultModel = ResolveDefaultModel();
 
             SendCommand = new RelayCommand(async _ => await SendAsync(), _ => !_isSending && CanSend);
             OpenSettingsCommand = new RelayCommand(_ => SettingsRequested?.Invoke());
@@ -222,6 +275,8 @@ namespace TrayApp.ViewModels
                 else
                     SetStatus(ChatUiStatus.Error, "Konfiguration mangler", "Angiv AI endpoint i Indstillinger for at sende beskeder.");
 
+                _ = RefreshAvailableModelsAsync();
+
                 _logger.LogInfo("MainWindowViewModel initialiseret.");
             }
             catch (Exception ex)
@@ -250,10 +305,26 @@ namespace TrayApp.ViewModels
 
         public void RefreshConfigurationState()
         {
+            var previousDefaultModel = _lastKnownDefaultModel;
+
             OnPropertyChanged(nameof(IsEndpointConfigured));
             OnPropertyChanged(nameof(EmptyStateTitle));
             OnPropertyChanged(nameof(EmptyStateDescription));
             OnPropertyChanged(nameof(ShowConfigurationEmptyState));
+            OnPropertyChanged(nameof(CanSelectModel));
+
+            SeedAvailableModels();
+
+            var currentDefaultModel = ResolveDefaultModel();
+            if (!string.Equals(previousDefaultModel, currentDefaultModel, StringComparison.OrdinalIgnoreCase))
+            {
+                _sessionModelOverrides.Clear();
+                EnsureSelectedSessionModel();
+                _logger.LogInfo($"Standardmodel ændret i indstillinger: '{previousDefaultModel}' -> '{currentDefaultModel}'. Session-model overrides nulstillet.");
+            }
+
+            _lastKnownDefaultModel = currentDefaultModel;
+            _ = RefreshAvailableModelsAsync();
 
             if (IsLoading || IsInitializing)
                 return;
@@ -328,6 +399,7 @@ namespace TrayApp.ViewModels
             try
             {
                 await _repo.DeleteSessionAsync(session.Id);
+                _sessionModelOverrides.Remove(session.Id);
                 ChatSessions.Remove(session);
 
                 if (ActiveSession == session)
@@ -346,6 +418,7 @@ namespace TrayApp.ViewModels
             try
             {
                 await _repo.DeleteAllAsync();
+                _sessionModelOverrides.Clear();
                 ChatSessions.Clear();
                 ActiveSession = null;
             }
@@ -437,7 +510,8 @@ namespace TrayApp.ViewModels
                     SetStatus(ChatUiStatus.Receiving, "Tænker", "AI forbereder et svar...");
                     await Task.Delay(AiThinkingDelayMs, token);
 
-                    await foreach (var chunk in _chatService.StreamResponseAsync(prompt, token))
+                    var modelForSession = ResolveModelForSession(ActiveSession);
+                    await foreach (var chunk in _chatService.StreamResponseAsync(prompt, token, modelForSession))
                     {
                         if (!receivedAnyChunk)
                         {
@@ -674,6 +748,140 @@ namespace TrayApp.ViewModels
             ErrorHint = null;
         }
 
+        private void SeedAvailableModels()
+        {
+            var settings = _settings.Settings;
+
+            AddModelIfMissing(settings.Model);
+            foreach (var modelName in settings.CachedModels)
+                AddModelIfMissing(modelName);
+        }
+
+        private void AddModelIfMissing(string? modelName)
+        {
+            if (string.IsNullOrWhiteSpace(modelName))
+                return;
+
+            var normalized = modelName.Trim();
+            if (AvailableModels.Any(existing => string.Equals(existing, normalized, StringComparison.OrdinalIgnoreCase)))
+                return;
+
+            AvailableModels.Add(normalized);
+        }
+
+        private string ResolveDefaultModel()
+        {
+            var settingsModel = _settings.Settings.Model?.Trim();
+            if (!string.IsNullOrWhiteSpace(settingsModel))
+                return NormalizeModelToAvailable(settingsModel);
+
+            if (AvailableModels.Count > 0)
+                return AvailableModels[0];
+
+            return "gpt-4o-mini";
+        }
+
+        private string NormalizeModelToAvailable(string? modelName)
+        {
+            if (string.IsNullOrWhiteSpace(modelName))
+                return string.Empty;
+
+            var normalized = modelName.Trim();
+            var match = AvailableModels.FirstOrDefault(existing =>
+                string.Equals(existing, normalized, StringComparison.OrdinalIgnoreCase));
+
+            return match ?? normalized;
+        }
+
+        private string ResolveModelForSession(ChatSession? session)
+        {
+            if (session == null)
+                return ResolveDefaultModel();
+
+            if (_sessionModelOverrides.TryGetValue(session.Id, out var existing) && !string.IsNullOrWhiteSpace(existing))
+            {
+                var normalized = existing.Trim();
+                if (AvailableModels.Count == 0 || AvailableModels.Any(model => string.Equals(model, normalized, StringComparison.OrdinalIgnoreCase)))
+                    return NormalizeModelToAvailable(normalized);
+
+                _logger.LogWarning($"Session-model '{normalized}' findes ikke længere i model-listen. Falder tilbage til standard-modellen.");
+                _sessionModelOverrides.Remove(session.Id);
+            }
+
+            return ResolveDefaultModel();
+        }
+
+        private void EnsureSelectedSessionModel()
+        {
+            var model = ResolveModelForSession(_activeSession);
+
+            if (string.IsNullOrWhiteSpace(model) && AvailableModels.Count > 0)
+                model = AvailableModels[0];
+
+            if (string.IsNullOrWhiteSpace(model))
+                model = "gpt-4o-mini";
+
+            AddModelIfMissing(model);
+            _isSyncingSelectedSessionModel = true;
+            try
+            {
+                SelectedSessionModel = model;
+            }
+            finally
+            {
+                _isSyncingSelectedSessionModel = false;
+            }
+
+            OnPropertyChanged(nameof(SelectedSessionModel));
+            _lastKnownDefaultModel = ResolveDefaultModel();
+            OnPropertyChanged(nameof(CanSelectModel));
+        }
+
+        private async Task RefreshAvailableModelsAsync()
+        {
+            if (_disposed || IsLoadingModels)
+                return;
+
+            if (!IsEndpointConfigured)
+            {
+                EnsureSelectedSessionModel();
+                return;
+            }
+
+            IsLoadingModels = true;
+
+            try
+            {
+                var models = await _chatService.GetAvailableModelsAsync(_lifetimeCts.Token).ConfigureAwait(false);
+                await RunOnUiThreadAsync(() =>
+                {
+                    AvailableModels.Clear();
+                    foreach (var modelName in models)
+                        AddModelIfMissing(modelName);
+
+                    AddModelIfMissing(_settings.Settings.Model);
+                    EnsureSelectedSessionModel();
+                });
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (ChatServiceException ex)
+            {
+                _logger.LogWarning($"Kunne ikke hente model-liste i hovedvinduet: {ex.Message}");
+                await RunOnUiThreadAsync(EnsureSelectedSessionModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Uventet fejl under hentning af model-liste i hovedvinduet.", ex);
+                await RunOnUiThreadAsync(EnsureSelectedSessionModel);
+            }
+            finally
+            {
+                IsLoadingModels = false;
+            }
+        }
+
         private void NotifyEmptyStateChanged()
         {
             OnPropertyChanged(nameof(ShowEmptyState));
@@ -734,6 +942,7 @@ namespace TrayApp.ViewModels
         private void RaiseCommandStateChanged()
         {
             OnPropertyChanged(nameof(CanSend));
+            OnPropertyChanged(nameof(CanSelectModel));
             OnPropertyChanged(nameof(IsInputEnabled));
             OnPropertyChanged(nameof(IsEndpointConfigured));
             OnPropertyChanged(nameof(EmptyStateTitle));

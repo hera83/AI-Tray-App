@@ -5,70 +5,24 @@
     <ResourceDictionary Source="../Resources/Spacing.xaml" />
     <ResourceDictionary Source="../Resources/Corners.xaml" />
     <ResourceDictionary Source="../Resources/Typography.xaml" />
+    <ResourceDictionary Source="../Resources/Elevation.xaml" />
+    <ResourceDictionary Source="Controls.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <Style x:Key="ChatCardBorderBaseStyle" TargetType="Border">
     <Setter Property="CornerRadius" Value="{StaticResource CornerRadius.Large}" />
     <Setter Property="Padding" Value="{StaticResource Thickness.Card.Padding}" />
-    <Setter Property="Background" Value="{DynamicResource Brush.Theme.SurfaceElevatedBackground}" />
+    <Setter Property="Background" Value="{DynamicResource Brush.Theme.SurfaceBackground}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.Border}" />
     <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Effect" Value="{StaticResource Effect.Shadow.Card}" />
   </Style>
 
-  <Style x:Key="ChatBaseTextBoxStyle" TargetType="TextBox">
-    <Setter Property="Background" Value="{DynamicResource Brush.Theme.InputBackground}"/>
-    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.InputForeground}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.Border}"/>
-    <Setter Property="BorderThickness" Value="{StaticResource Thickness.Border.Normal}"/>
-    <Setter Property="Padding" Value="{StaticResource Thickness.Input.ControlPadding}"/>
-    <Setter Property="FontSize" Value="{StaticResource FontSize.Body}"/>
-    <Setter Property="CaretBrush" Value="{DynamicResource Brush.Theme.InputForeground}"/>
-    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-    <Style.Triggers>
-      <Trigger Property="IsKeyboardFocused" Value="True">
-        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.State.FocusRing}" />
-        <Setter Property="BorderThickness" Value="{StaticResource Thickness.Border.Focused}" />
-      </Trigger>
-      <Trigger Property="IsEnabled" Value="False">
-        <Setter Property="Background" Value="{DynamicResource Brush.Theme.State.DisabledBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.State.DisabledForeground}" />
-        <Setter Property="Opacity" Value="{StaticResource Opacity.Disabled}" />
-      </Trigger>
-    </Style.Triggers>
-  </Style>
+  <Style x:Key="ChatBaseTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource BaseTextBoxStyle}" />
 
-  <Style x:Key="ChatBaseButtonStyle" TargetType="Button">
-    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.ButtonPrimaryForeground}" />
-    <Setter Property="Background" Value="{DynamicResource Brush.Theme.ButtonPrimaryBackground}" />
-    <Setter Property="BorderBrush" Value="Transparent" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="Padding" Value="{StaticResource Thickness.Button.PrimaryPadding}" />
-    <Setter Property="MinHeight" Value="{StaticResource Size.Button.MinHeight}" />
-    <Setter Property="Cursor" Value="Hand" />
-    <Setter Property="FontWeight" Value="SemiBold" />
-    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-    <Style.Triggers>
-      <Trigger Property="IsMouseOver" Value="True">
-        <Setter Property="Opacity" Value="0.95" />
-      </Trigger>
-      <Trigger Property="IsKeyboardFocused" Value="True">
-        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.State.FocusRing}" />
-        <Setter Property="BorderThickness" Value="{StaticResource Thickness.Border.Focused}" />
-      </Trigger>
-      <Trigger Property="IsEnabled" Value="False">
-        <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.State.DisabledForeground}" />
-        <Setter Property="Opacity" Value="{StaticResource Opacity.Disabled}" />
-      </Trigger>
-    </Style.Triggers>
-  </Style>
+  <Style x:Key="ChatBaseButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}" />
 
-  <Style x:Key="ChatSecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ChatBaseButtonStyle}">
-    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.ButtonSecondaryForeground}" />
-    <Setter Property="Background" Value="{DynamicResource Brush.Theme.ButtonSecondaryBackground}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.Border}" />
-    <Setter Property="Padding" Value="{StaticResource Thickness.Button.SecondaryPadding}" />
-    <Setter Property="FontWeight" Value="Normal" />
-  </Style>
+  <Style x:Key="ChatSecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}" />
 
   <Style x:Key="ChatConversationSurfaceStyle" TargetType="Border" BasedOn="{StaticResource ChatCardBorderBaseStyle}">
     <Setter Property="Background" Value="{DynamicResource Brush.Theme.Chat.CanvasBackground}" />
@@ -98,7 +52,8 @@
 
   <Style x:Key="ChatMessageTextStyle" TargetType="TextBlock">
     <Setter Property="TextWrapping" Value="Wrap" />
-    <Setter Property="LineHeight" Value="22" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+    <Setter Property="LineHeight" Value="{StaticResource LineHeight.Normal}" />
     <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Chat.Message.AssistantForeground}" />
   </Style>
 
@@ -127,7 +82,7 @@
   <Style x:Key="ChatRoleBadgeTextStyle" TargetType="TextBlock">
     <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Chat.RoleBadgeForeground}" />
     <Setter Property="FontSize" Value="{StaticResource FontSize.Caption}" />
-    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontWeight" Value="{StaticResource FontWeight.SemiBold}" />
   </Style>
 
   <Style x:Key="ChatTimestampTextStyle" TargetType="TextBlock">
@@ -153,7 +108,7 @@
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Padding" Value="0" />
-    <Setter Property="FontSize" Value="{StaticResource FontSize.Emphasis}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
   </Style>
 
   <Style x:Key="ChatFloatingActionButtonStyle" TargetType="Button" BasedOn="{StaticResource ChatSecondaryButtonStyle}">
@@ -161,13 +116,14 @@
     <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Chat.FloatingActionForeground}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.Chat.FloatingActionBorder}" />
     <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Effect" Value="{StaticResource Effect.Shadow.Floating}" />
   </Style>
 
   <Style x:Key="ChatTypingDotStyle" TargetType="Ellipse">
     <Setter Property="Width" Value="{StaticResource Size.Chat.TypingDot}" />
     <Setter Property="Height" Value="{StaticResource Size.Chat.TypingDot}" />
     <Setter Property="Fill" Value="{DynamicResource Brush.Theme.Chat.LoadingDot}" />
-    <Setter Property="Opacity" Value="0.35" />
+    <Setter Property="Opacity" Value="0.4" />
   </Style>
 
 </ResourceDictionary>

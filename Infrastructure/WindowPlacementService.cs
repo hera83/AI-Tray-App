@@ -15,8 +15,6 @@ namespace TrayApp.Infrastructure
 
         private record PlacementRecord(double Left, double Top, double Width, double Height, string State);
 
-        private const double DefaultWidth  = 500;
-        private const double DefaultHeight = 720;
         private const double MinDimension  = 200;
 
         public WindowPlacementService(string path) => _path = path;
@@ -52,9 +50,19 @@ namespace TrayApp.Infrastructure
             {
                 window.Left        = rec.Left;
                 window.Top         = rec.Top;
-                window.Width       = rec.Width;
-                window.Height      = rec.Height;
-                window.WindowState = Enum.TryParse<WindowState>(rec.State, out var ws) ? ws : WindowState.Normal;
+
+                var isFixedSizeWindow = window.ResizeMode == ResizeMode.NoResize;
+                if (!isFixedSizeWindow)
+                {
+                    window.Width  = rec.Width;
+                    window.Height = rec.Height;
+                }
+
+                var restoredState = Enum.TryParse<WindowState>(rec.State, out var ws) ? ws : WindowState.Normal;
+                if (isFixedSizeWindow && restoredState == WindowState.Maximized)
+                    restoredState = WindowState.Normal;
+
+                window.WindowState = restoredState;
             }
             else
             {
@@ -84,8 +92,12 @@ namespace TrayApp.Infrastructure
 
         private static void ApplyDefaultPlacement(Window window)
         {
-            window.Width  = DefaultWidth;
-            window.Height = DefaultHeight;
+            if (double.IsNaN(window.Width) || window.Width < MinDimension)
+                window.Width = MinDimension * 2;
+
+            if (double.IsNaN(window.Height) || window.Height < MinDimension)
+                window.Height = MinDimension * 2;
+
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             window.WindowState = WindowState.Normal;
         }

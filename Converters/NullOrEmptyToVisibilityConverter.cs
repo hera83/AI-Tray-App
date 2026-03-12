@@ -10,7 +10,14 @@ namespace TrayApp.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var text = value as string;
-            return string.IsNullOrWhiteSpace(text) ? Visibility.Collapsed : Visibility.Visible;
+            var isEmpty = string.IsNullOrWhiteSpace(text);
+            var invert = parameter is string mode &&
+                         string.Equals(mode, "Invert", StringComparison.OrdinalIgnoreCase);
+
+            if (invert)
+                return isEmpty ? Visibility.Visible : Visibility.Collapsed;
+
+            return isEmpty ? Visibility.Collapsed : Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

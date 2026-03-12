@@ -7,12 +7,149 @@
         Height="{StaticResource Size.Window.Main.Height}"
         Width="{StaticResource Size.Window.Main.Width}"
         ResizeMode="NoResize"
-        Background="{DynamicResource Brush.Theme.WindowBackground}">
+        WindowStyle="None"
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter" />
         <converters:MarkdownMessageToFlowDocumentConverter x:Key="MarkdownMessageToFlowDocumentConverter" />
+
+        <Style x:Key="SidebarConversationItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+            <Setter Property="Padding" Value="12,11" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="ItemCard"
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="{StaticResource CornerRadius.Medium}"
+                                Background="{DynamicResource Brush.Theme.SurfaceBackground}"
+                                BorderBrush="{DynamicResource Brush.Theme.Border}"
+                                BorderThickness="1"
+                                Effect="{StaticResource Effect.Shadow.SidebarItem}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemCard" Property="Background" Value="{DynamicResource Brush.Theme.State.HoverBackground}" />
+                                <Setter TargetName="ItemCard" Property="BorderBrush" Value="{DynamicResource Brush.Theme.State.HoverOverlay}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="ItemCard" Property="BorderBrush" Value="{DynamicResource Brush.Theme.State.FocusRing}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemCard" Property="Background" Value="{DynamicResource Brush.Theme.Chat.RoleBadgeBackground}" />
+                                <Setter TargetName="ItemCard" Property="BorderBrush" Value="{DynamicResource Brush.Theme.Accent}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SidebarDeleteIconButtonStyle" TargetType="Button" BasedOn="{StaticResource RoundIconDangerButtonStyle}">
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="MinWidth" Value="28" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="8,0,0,0" />
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="IsHitTestVisible" Value="True" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="IsHitTestVisible" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SidebarConversationIconHostStyle" TargetType="Border">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0,1,10,0" />
+            <Setter Property="Background" Value="{DynamicResource Brush.Theme.State.HoverBackground}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource CornerRadius.Small}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.State.HoverOverlay}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Brush.Theme.Chat.RoleBadgeBackground}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.Accent}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SidebarConversationIconPathStyle" TargetType="Path">
+            <Setter Property="Width" Value="14" />
+            <Setter Property="Height" Value="14" />
+            <Setter Property="Stretch" Value="Uniform" />
+            <Setter Property="Fill" Value="{DynamicResource Brush.Theme.TextSecondary}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter Property="Fill" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter Property="Fill" Value="{DynamicResource Brush.Theme.Accent}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SidebarConversationTitleTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+            <Setter Property="FontWeight" Value="{StaticResource FontWeight.Medium}" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter Property="FontWeight" Value="{StaticResource FontWeight.SemiBold}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SidebarConversationMetaTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="{StaticResource FontSize.Caption}" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextMuted}" />
+            <Setter Property="Opacity" Value="0.95" />
+            <Setter Property="Margin" Value="{StaticResource Thickness.Margin.Top.3}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextSecondary}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ComposerInputShellStyle" TargetType="Border">
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Background" Value="{DynamicResource Brush.Theme.InputBackground}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource CornerRadius.Medium}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.State.FocusRing.Thin}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.State.FocusRing}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
         <DataTemplate x:Key="ChatMessageTemplate">
             <Grid x:Name="MessageRow" Margin="{StaticResource Thickness.Chat.Row.Left}">
@@ -20,9 +157,14 @@
                     <Border x:Name="MessageBubble" Style="{StaticResource ChatAssistantBubbleStyle}" Margin="{StaticResource Thickness.Chat.Bubble.Left}">
                         <StackPanel>
                             <FlowDocumentScrollViewer x:Name="MessageMarkdown"
-                                                      Document="{Binding Content, Converter={StaticResource MarkdownMessageToFlowDocumentConverter}}"
                                                       Style="{StaticResource ChatMarkdownViewerStyle}"
                                                       Visibility="{Binding Content, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                                <FlowDocumentScrollViewer.Document>
+                                    <MultiBinding Converter="{StaticResource MarkdownMessageToFlowDocumentConverter}">
+                                        <Binding Path="Content" />
+                                        <Binding Path="Role" />
+                                    </MultiBinding>
+                                </FlowDocumentScrollViewer.Document>
                             </FlowDocumentScrollViewer>
 
                             <StackPanel x:Name="TypingIndicator" Orientation="Horizontal" Visibility="Collapsed">
@@ -59,7 +201,6 @@
                                         </EventTrigger>
                                     </Ellipse.Triggers>
                                 </Ellipse>
-                                <TextBlock Text="AI skriver..." Style="{StaticResource CaptionStyle}" Margin="{StaticResource Thickness.Inline.Left.10}" VerticalAlignment="Center" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -85,15 +226,36 @@
     </Window.Resources>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <Border Margin="0"
+                Background="{DynamicResource Brush.Theme.WindowBackground}"
+                BorderBrush="{DynamicResource Brush.Theme.Border}"
+                BorderThickness="1"
+            CornerRadius="{StaticResource CornerRadius.Large}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="24" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="Transparent"
+                        MouseLeftButtonDown="DragRegion_MouseLeftButtonDown" />
+
+                <Grid Grid.Row="1" Margin="{StaticResource Thickness.Page.MainPadding}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0"
                 Width="{StaticResource Size.Sidebar.Width}"
                 Background="{DynamicResource Brush.Theme.SidebarBackground}"
                 Padding="{StaticResource Thickness.Sidebar.Padding}"
+                Margin="0,0,16,0"
+                CornerRadius="{StaticResource CornerRadius.Large}"
+                BorderBrush="{DynamicResource Brush.Theme.Border}"
+                BorderThickness="1"
+                Effect="{StaticResource Effect.Shadow.Card}"
                 Visibility="{Binding IsHistoryPaneExpanded, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -101,67 +263,47 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="Chat-historik" Style="{StaticResource Heading3Style}" Margin="{StaticResource Thickness.Margin.Bottom.8}" />
+                <TextBlock Text="Chat-historik" Style="{StaticResource Heading2Style}" Margin="{StaticResource Thickness.Margin.Bottom.10}" />
 
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding ChatSessions}"
                          SelectedItem="{Binding ActiveSession, Mode=TwoWay}"
+                         ItemContainerStyle="{StaticResource SidebarConversationItemStyle}"
                          Background="Transparent"
                          BorderThickness="0"
+                         ScrollViewer.CanContentScroll="False"
+                         ScrollViewer.PanningMode="VerticalOnly"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
-                            <Setter Property="Padding" Value="{StaticResource Thickness.List.ItemPadding}" />
-                            <Setter Property="Margin" Value="{StaticResource Thickness.List.ItemMargin}" />
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListBoxItem">
-                                        <Border x:Name="ItemBorder"
-                                                Padding="{TemplateBinding Padding}"
-                                                CornerRadius="{StaticResource CornerRadius.Medium}"
-                                                Background="Transparent"
-                                                BorderBrush="Transparent"
-                                                BorderThickness="1">
-                                            <ContentPresenter />
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Brush.Theme.SurfaceBackground}" />
-                                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource Brush.Theme.Border}" />
-                                            </Trigger>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Brush.Theme.Accent}" />
-                                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource Brush.Theme.Accent}" />
-                                                <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextOnAccent}" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="{Binding Title}" FontSize="{StaticResource FontSize.Body}" FontWeight="{StaticResource FontWeight.Medium}" TextTrimming="CharacterEllipsis" />
-                                    <TextBlock Text="{Binding UpdatedAt, StringFormat='{}{0:dd.MM.yyyy \u00b7 HH:mm}'}" FontSize="{StaticResource FontSize.Caption}" Margin="{StaticResource Thickness.Margin.Top.2}" Opacity="0.9" />
+
+                                <Border Grid.Column="0"
+                                        Style="{StaticResource SidebarConversationIconHostStyle}">
+                                    <Path Style="{StaticResource SidebarConversationIconPathStyle}"
+                                          Data="M3,2 L13,2 C13.5523,2 14,2.44772 14,3 L14,9 C14,9.55228 13.5523,10 13,10 L7.8,10 L5.2,12.6 L5.2,10 L3,10 C2.44772,10 2,9.55228 2,9 L2,3 C2,2.44772 2.44772,2 3,2 Z" />
+                                </Border>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{Binding Title}" Style="{StaticResource SidebarConversationTitleTextStyle}" />
+                                    <TextBlock Text="{Binding UpdatedAt, StringFormat='{}{0:dd.MM.yyyy \u00b7 HH:mm}'}" Style="{StaticResource SidebarConversationMetaTextStyle}" />
                                 </StackPanel>
-                                <Button Grid.Column="1"
-                                        Content="Slet"
+
+                                <Button Grid.Column="2"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
                                         Command="{Binding DataContext.DeleteSessionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}"
-                                        VerticalAlignment="Center"
-                                        Margin="{StaticResource Thickness.Margin.Left.6}"
                                         ToolTip="Slet samtale"
-                                        Style="{StaticResource SecondaryButtonStyle}" />
+                                        Style="{StaticResource SidebarDeleteIconButtonStyle}">
+                                    <Path Style="{StaticResource ButtonIconPathStyle}"
+                                          Data="M6,1.5 L10,1.5 L10.8,2.6 L13.5,2.6 L13.5,3.8 L2.5,3.8 L2.5,2.6 L5.2,2.6 Z M3.2,4.8 L12.8,4.8 L12.1,14.2 C12.05,14.75 11.6,15.2 11.05,15.2 L4.95,15.2 C4.4,15.2 3.95,14.75 3.9,14.2 Z M6,6.8 L7.2,6.8 L7.2,13 L6,13 Z M8.8,6.8 L10,6.8 L10,13 L8.8,13 Z" />
+                                </Button>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -169,138 +311,213 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Column="1" Margin="{StaticResource Thickness.Page.MainPadding}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <DockPanel Grid.Row="0" LastChildFill="False" Margin="{StaticResource Thickness.Form.FieldBottom}">
-                <Button DockPanel.Dock="Left"
-                        Content="{Binding HistoryPaneToggleText}"
-                        Command="{Binding ToggleHistoryPaneCommand}"
-                        Style="{StaticResource SecondaryButtonStyle}" />
-                <Button DockPanel.Dock="Right"
-                        Content="Ny chat"
-                        Command="{Binding NewChatCommand}"
-                        Style="{StaticResource SecondaryButtonStyle}" />
-            </DockPanel>
-
-            <!-- Messages -->
-            <Grid Grid.Row="1">
-                <Border Style="{StaticResource ChatConversationSurfaceStyle}">
-                    <ScrollViewer x:Name="MessagesScroll" Grid.Row="0" VerticalScrollBarVisibility="Auto" Background="Transparent"
-                                  behaviors:ScrollViewerBehavior.Monitor="True"
-                                  behaviors:ScrollViewerBehavior.IsNearBottom="{Binding IsUserNearBottom, Mode=TwoWay}"
-                                  behaviors:ScrollViewerBehavior.ScrollToBottomTrigger="{Binding ScrollToBottomRequest}">
-                        <ItemsControl ItemsSource="{Binding Messages}"
-                                      ItemTemplate="{StaticResource ChatMessageTemplate}" />
-                </ScrollViewer>
-                    </Border>
-
-                <!-- empty state when no messages -->
-                <Border Background="Transparent"
-                        IsHitTestVisible="False"
-                        Visibility="{Binding ShowConfigurationEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <Grid>
-                        <Border Width="{StaticResource Size.Chat.EmptyStateHalo}" Height="{StaticResource Size.Chat.EmptyStateHalo}" Background="{DynamicResource Brush.Theme.Chat.EmptyStateAccent}" CornerRadius="{StaticResource CornerRadius.Circle.Halo}" Opacity="0.8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        <Border Style="{StaticResource ChatEmptyStateCardStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <StackPanel>
-                                <Border Width="{StaticResource Size.Chat.EmptyStateBadge}" Height="{StaticResource Size.Chat.EmptyStateBadge}" Background="{DynamicResource Brush.Theme.Chat.RoleBadgeBackground}" CornerRadius="{StaticResource CornerRadius.Circle.Badge}" HorizontalAlignment="Center">
-                                    <TextBlock Text="AI" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource BodyLargeStyle}" />
-                                </Border>
-                                <TextBlock Text="{Binding EmptyStateTitle}" Style="{StaticResource Heading1Style}" HorizontalAlignment="Center" Margin="{StaticResource Thickness.Form.SectionGap}" />
-                                <TextBlock Text="{Binding EmptyStateDescription}" Style="{StaticResource BodyStyle}" HorizontalAlignment="Center" Margin="{StaticResource Thickness.Form.FieldBottom}" TextWrapping="Wrap" TextAlignment="Center" />
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </Border>
-
-                <!-- Go to latest button -->
-                <Button Content="Gå til nyeste" Width="{StaticResource Size.Chat.FloatingButton.Width}" Height="{StaticResource Size.Chat.FloatingButton.Height}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="{StaticResource Thickness.Chat.FloatingButton}"
-                        Visibility="{Binding ShowNewMessages, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Command="{Binding GoToLatestCommand}"
-                        Style="{StaticResource ChatFloatingActionButtonStyle}" />
-            </Grid>
-
-            <!-- Input area -->
-            <Border Grid.Row="2" Style="{StaticResource ChatComposerContainerStyle}" Margin="{StaticResource Thickness.Chat.ComposerTop}">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal"
-                                Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                Margin="{StaticResource Thickness.Margin.Bottom.6}">
-                            <Ellipse Style="{StaticResource ChatTypingDotStyle}">
-                                <Ellipse.Triggers>
-                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Ellipse.Triggers>
-                            </Ellipse>
-                            <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
-                                <Ellipse.Triggers>
-                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.15">
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Ellipse.Triggers>
-                            </Ellipse>
-                            <Ellipse Style="{StaticResource ChatTypingDotStyle}" Margin="{StaticResource Thickness.Chat.TypingDotGap}">
-                                <Ellipse.Triggers>
-                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True" BeginTime="0:0:0.3">
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.55" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Ellipse.Triggers>
-                            </Ellipse>
-                        <TextBlock Text="AI arbejder på svaret..." Style="{StaticResource CaptionStyle}" Margin="{StaticResource Thickness.Inline.Left.10}" VerticalAlignment="Center" />
-                    </StackPanel>
-
+                <Border Grid.Row="0"
+                        Margin="{StaticResource Thickness.Form.FieldBottom}"
+                    Background="Transparent"
+                        Padding="0,0,0,12"
+                        BorderBrush="{DynamicResource Brush.Theme.Divider}"
+                    BorderThickness="0,0,0,1"
+                    MouseLeftButtonDown="DragRegion_MouseLeftButtonDown">
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="12" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0"
-                                 x:Name="InputBox"
-                                 Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
-                                 AcceptsReturn="True"
-                                 VerticalScrollBarVisibility="Auto"
-                                 MinHeight="{StaticResource Size.Input.MinHeight}"
-                                 Style="{StaticResource ChatComposerTextBoxStyle}"
-                                 Margin="{StaticResource Thickness.Margin.Right.8}"
-                                 IsEnabled="{Binding IsInputEnabled}"
-                                 ToolTip="Shift+Enter for ny linje · Enter for at sende"
-                                 behaviors:EnterKeyBehavior.SendCommand="{Binding SendCommand}"
-                                 behaviors:TextBoxAutoGrowBehavior.EnableAutoGrow="True"
-                                 behaviors:TextBoxAutoGrowBehavior.MinHeight="{StaticResource Size.Input.MinHeight}"
-                                 behaviors:TextBoxAutoGrowBehavior.MaxHeight="{StaticResource Size.Input.MaxHeight}" />
+                        <Button Grid.Column="0"
+                                Command="{Binding ToggleHistoryPaneCommand}"
+                                ToolTip="{Binding HistoryPaneToggleText}"
+                                Style="{StaticResource RoundIconButtonStyle}">
+                            <Grid>
+                                <Path Data="M8,2 C4.686,2 2,4.686 2,8 C2,11.314 4.686,14 8,14 C11.314,14 14,11.314 14,8 C14,4.686 11.314,2 8,2 Z M8.8,4.4 L8.8,8.2 L11.2,9.6 L10.4,10.9 L7.2,9 L7.2,4.4 Z">
+                                    <Path.Style>
+                                        <Style TargetType="Path" BasedOn="{StaticResource ButtonIconPathStyle}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.IsHistoryPaneExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Path.Style>
+                                </Path>
+                                <Path Data="M2,3 L14,3 C14.552,3 15,3.448 15,4 L15,12 C15,12.552 14.552,13 14,13 L2,13 C1.448,13 1,12.552 1,12 L1,4 C1,3.448 1.448,3 2,3 Z M2.4,4.4 L5.5,4.4 L5.5,11.6 L2.4,11.6 Z M6.7,4.4 L13.6,4.4 L13.6,11.6 L6.7,11.6 Z">
+                                    <Path.Style>
+                                        <Style TargetType="Path" BasedOn="{StaticResource ButtonIconPathStyle}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.IsHistoryPaneExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Path.Style>
+                                </Path>
+                            </Grid>
+                        </Button>
 
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
-                            <Button Content="Stop"
-                                    Command="{Binding StopGenerationCommand}"
-                                    Style="{StaticResource SecondaryButtonStyle}"
-                                    Margin="{StaticResource Thickness.Margin.Right.8}"
-                                    Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                            <Button Content="Send"
-                                    Command="{Binding SendCommand}"
-                                    Style="{StaticResource PrimaryButtonStyle}"
-                                    IsEnabled="{Binding CanSend}" />
-                        </StackPanel>
+                        <Grid Grid.Column="2" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <ComboBox
+                                      MinWidth="220"
+                                      MaxWidth="280"
+                                      Height="36"
+                                      VerticalAlignment="Center"
+                                      ItemsSource="{Binding AvailableModels}"
+                                      SelectedItem="{Binding SelectedSessionModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Text="{Binding SelectedSessionModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{Binding CanSelectModel}"
+                                      ToolTip="Model for denne chat-session" />
+                        </Grid>
+
+                        <Button Grid.Column="3"
+                                Command="{Binding OpenSettingsCommand}"
+                                ToolTip="Indstillinger"
+                                Style="{StaticResource RoundIconButtonStyle}"
+                                Margin="{StaticResource Thickness.Margin.Right.8}">
+                            <Path Style="{StaticResource ButtonIconPathStyle}"
+                                  Data="M9.8,1.5 L10.4,3.1 C10.9,3.3 11.3,3.5 11.7,3.8 L13.2,3.2 L14.3,5.1 L13,6.2 C13.1,6.6 13.2,7 13.2,7.5 C13.2,8 13.1,8.4 13,8.8 L14.3,9.9 L13.2,11.8 L11.7,11.2 C11.3,11.5 10.9,11.7 10.4,11.9 L9.8,13.5 L7.6,13.5 L7,11.9 C6.5,11.7 6.1,11.5 5.7,11.2 L4.2,11.8 L3.1,9.9 L4.4,8.8 C4.3,8.4 4.2,8 4.2,7.5 C4.2,7 4.3,6.6 4.4,6.2 L3.1,5.1 L4.2,3.2 L5.7,3.8 C6.1,3.5 6.5,3.3 7,3.1 L7.6,1.5 Z M8.7,5.4 C7.54,5.4 6.6,6.34 6.6,7.5 C6.6,8.66 7.54,9.6 8.7,9.6 C9.86,9.6 10.8,8.66 10.8,7.5 C10.8,6.34 9.86,5.4 8.7,5.4 Z" />
+                        </Button>
+
+                        <Button Grid.Column="4"
+                                Command="{Binding NewChatCommand}"
+                                ToolTip="Ny chat"
+                                Style="{StaticResource RoundIconButtonStyle}">
+                            <Path Style="{StaticResource ButtonIconPathStyle}"
+                                  Data="M7,2 L9,2 L9,7 L14,7 L14,9 L9,9 L9,14 L7,14 L7,9 L2,9 L2,7 L7,7 Z" />
+                        </Button>
                     </Grid>
-                </StackPanel>
-            </Border>
-        </Grid>
+                </Border>
+
+                <!-- Messages -->
+                <Grid Grid.Row="1">
+                    <Border Style="{StaticResource ChatConversationSurfaceStyle}">
+                        <ScrollViewer x:Name="MessagesScroll"
+                                      Grid.Row="0"
+                                      VerticalScrollBarVisibility="Auto"
+                                      Background="Transparent"
+                                      CanContentScroll="False"
+                                      PanningMode="VerticalOnly"
+                                      behaviors:ScrollViewerBehavior.Monitor="True"
+                                      behaviors:ScrollViewerBehavior.IsNearBottom="{Binding IsUserNearBottom, Mode=TwoWay}"
+                                      behaviors:ScrollViewerBehavior.ScrollToBottomTrigger="{Binding ScrollToBottomRequest}">
+                            <Grid HorizontalAlignment="Center"
+                                  MaxWidth="{StaticResource Size.Chat.MessageLane.MaxWidth}"
+                                  Margin="0,2,0,4">
+                                <ItemsControl ItemsSource="{Binding Messages}"
+                                              ItemTemplate="{StaticResource ChatMessageTemplate}" />
+                            </Grid>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- empty state when no messages -->
+                    <Border Background="Transparent"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding ShowConfigurationEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid>
+                            <Border Width="{StaticResource Size.Chat.EmptyStateHalo}" Height="{StaticResource Size.Chat.EmptyStateHalo}" Background="{DynamicResource Brush.Theme.Chat.EmptyStateAccent}" CornerRadius="{StaticResource CornerRadius.Circle.Halo}" Opacity="0.9" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Border Style="{StaticResource ChatEmptyStateCardStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <StackPanel>
+                                    <Border Width="{StaticResource Size.Chat.EmptyStateBadge}" Height="{StaticResource Size.Chat.EmptyStateBadge}" Background="{DynamicResource Brush.Theme.Chat.RoleBadgeBackground}" CornerRadius="{StaticResource CornerRadius.Circle.Badge}" HorizontalAlignment="Center">
+                                        <TextBlock Text="AI" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource BodyLargeStyle}" />
+                                    </Border>
+                                    <TextBlock Text="{Binding EmptyStateTitle}" Style="{StaticResource Heading1Style}" HorizontalAlignment="Center" Margin="{StaticResource Thickness.Form.SectionGap}" />
+                                    <TextBlock Text="{Binding EmptyStateDescription}" Style="{StaticResource BodyStyle}" HorizontalAlignment="Center" Margin="{StaticResource Thickness.Form.FieldBottom}" TextWrapping="Wrap" TextAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Go to latest button -->
+                        <Button Width="40"
+                            Height="40"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Margin="{StaticResource Thickness.Chat.FloatingButton}"
+                            Visibility="{Binding ShowNewMessages, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Command="{Binding GoToLatestCommand}"
+                            ToolTip="Gå til nyeste"
+                            Style="{StaticResource RoundIconButtonStyle}"
+                            Effect="{StaticResource Effect.Shadow.Floating}">
+                        <Path Style="{StaticResource ButtonIconPathStyle}"
+                              Data="M8,13 L3,8 L5,8 L5,3 L11,3 L11,8 L13,8 Z" />
+                        </Button>
+                </Grid>
+
+                <!-- Input area -->
+                <Border Grid.Row="2" Style="{StaticResource ChatComposerContainerStyle}" Margin="{StaticResource Thickness.Chat.ComposerTop}">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0"
+                                    Margin="{StaticResource Thickness.Margin.Right.8}"
+                                    Style="{StaticResource ComposerInputShellStyle}">
+                                <Grid>
+                                    <TextBox x:Name="InputBox"
+                                             Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
+                                             AcceptsReturn="True"
+                                             TextWrapping="Wrap"
+                                             HorizontalScrollBarVisibility="Disabled"
+                                             VerticalScrollBarVisibility="Auto"
+                                             MinHeight="{StaticResource Size.Input.MinHeight}"
+                                             MaxHeight="{StaticResource Size.Input.ChatMaxHeight}"
+                                             Style="{StaticResource ChatComposerTextBoxStyle}"
+                                             IsEnabled="{Binding IsInputEnabled}"
+                                             ToolTip="Shift+Enter for ny linje · Enter for at sende"
+                                             behaviors:EnterKeyBehavior.SendCommand="{Binding SendCommand}"
+                                             behaviors:TextBoxAutoGrowBehavior.EnableAutoGrow="True"
+                                             behaviors:TextBoxAutoGrowBehavior.MinHeight="{StaticResource Size.Input.MinHeight}"
+                                             behaviors:TextBoxAutoGrowBehavior.MaxHeight="{StaticResource Size.Input.ChatMaxHeight}" />
+
+                                    <TextBlock Text="Skriv en besked..."
+                                               IsHitTestVisible="False"
+                                               Margin="2,2,0,0"
+                                               VerticalAlignment="Top"
+                                               Foreground="{DynamicResource Brush.Theme.TextMuted}"
+                                               Visibility="{Binding InputText, Converter={StaticResource NullOrEmptyToVisibilityConverter}, ConverterParameter=Invert}" />
+                                </Grid>
+                            </Border>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                                <Button ToolTip="Stop svar"
+                                        Command="{Binding StopGenerationCommand}"
+                                        Style="{StaticResource RoundIconButtonStyle}"
+                                        Margin="{StaticResource Thickness.Margin.Right.8}"
+                                        Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Path Style="{StaticResource ButtonIconPathStyle}"
+                                          Data="M4,4 L12,4 L12,12 L4,12 Z" />
+                                </Button>
+                                <Button ToolTip="Send besked"
+                                        Command="{Binding SendCommand}"
+                                        Style="{StaticResource RoundIconAccentButtonStyle}"
+                                        IsEnabled="{Binding CanSend}">
+                                    <Path Style="{StaticResource ButtonIconPathStyle}"
+                                          Data="M2,3 L14,8 L2,13 L2,9 L9,8 L2,7 Z" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

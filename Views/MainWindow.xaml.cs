@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using TrayApp.ViewModels;
 
 namespace TrayApp.Views
@@ -139,6 +140,21 @@ namespace TrayApp.Views
                 return width;
 
             return 500;
+        }
+
+        private void DragRegion_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton != MouseButton.Left)
+                return;
+
+            try
+            {
+                DragMove();
+            }
+            catch
+            {
+                // no-op: DragMove can throw if mouse state changes mid-gesture
+            }
         }
     }
 }

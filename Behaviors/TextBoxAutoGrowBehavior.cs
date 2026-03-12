@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using WpfTextBox = System.Windows.Controls.TextBox;
 
 namespace TrayApp.Behaviors
@@ -44,12 +45,16 @@ namespace TrayApp.Behaviors
 
         private static void Tb_Loaded(object sender, RoutedEventArgs e)
         {
-            if (sender is WpfTextBox tb) AdjustHeight(tb);
+            if (sender is WpfTextBox tb)
+                tb.Dispatcher.BeginInvoke(new Action(() => AdjustHeight(tb)), DispatcherPriority.Background);
         }
 
         private static void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (sender is WpfTextBox tb) AdjustHeight(tb);
+            if (sender is not WpfTextBox tb)
+                return;
+
+            tb.Dispatcher.BeginInvoke(new Action(() => AdjustHeight(tb)), DispatcherPriority.Background);
         }
 
         private static void AdjustHeight(WpfTextBox tb)
@@ -58,10 +63,13 @@ namespace TrayApp.Behaviors
             {
                 var min = GetMinHeight(tb);
                 var max = GetMaxHeight(tb);
-                // extent height approximates the needed height
-                var desired = tb.ExtentHeight + 10;
+
+                // ExtentHeight reflects rendered wrapped content after layout.
+                var desired = tb.ExtentHeight + tb.Padding.Top + tb.Padding.Bottom + 2;
                 var h = Math.Max(min, Math.Min(max, desired));
-                tb.Height = h;
+
+                if (Math.Abs(tb.Height - h) > 0.5)
+                    tb.Height = h;
             }
             catch { }
         }

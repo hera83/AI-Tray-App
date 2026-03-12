@@ -35,7 +35,7 @@ namespace TrayApp.Services
             };
         }
 
-        public async IAsyncEnumerable<string> StreamResponseAsync(string prompt, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<string> StreamResponseAsync(string prompt, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken, string? modelOverride = null)
         {
             var settings = _settings.Settings;
             if (string.IsNullOrWhiteSpace(settings.AiEndpoint))
@@ -55,17 +55,20 @@ namespace TrayApp.Services
 
             var protocol = DetectEndpointProtocol(endpointUri);
             var requestUri = ResolveRequestUri(endpointUri, protocol);
+            var effectiveModel = string.IsNullOrWhiteSpace(modelOverride)
+                ? settings.Model
+                : modelOverride.Trim();
             var effectiveSystemPrompt = BuildEffectiveSystemPrompt(settings);
             var messages = BuildMessages(prompt, effectiveSystemPrompt);
             var payload = protocol == EndpointProtocol.OllamaChat
-                ? SerializeOllamaRequest(settings, messages)
-                : SerializeOpenAiRequest(settings, messages);
+                ? SerializeOllamaRequest(settings, messages, effectiveModel)
+                : SerializeOpenAiRequest(settings, messages, effectiveModel);
 
             using var content = new StringContent(payload, Encoding.UTF8, "application/json");
             using var request = new HttpRequestMessage(HttpMethod.Post, requestUri) { Content = content };
             ApplyAuthentication(request, settings.ApiKey, protocol);
 
-            _logger.LogInfo($"Sender AI-request til {requestUri.Host}{requestUri.AbsolutePath} (streaming={settings.UseStreaming}, protocol={protocol}).");
+            _logger.LogInfo($"Sender AI-request til {requestUri.Host}{requestUri.AbsolutePath} (model={effectiveModel}, streaming={settings.UseStreaming}, protocol={protocol}).");
             using var response = await SendAsync(request, settings.UseStreaming, cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
@@ -192,22 +195,22 @@ namespace TrayApp.Services
             lines.Add($"{label}: {value.Trim()}");
         }
 
-        private string SerializeOpenAiRequest(AppSettings settings, List<AiMessage> messages)
+        private string SerializeOpenAiRequest(AppSettings settings, List<AiMessage> messages, string model)
         {
             return JsonSerializer.Serialize(new AiChatRequest
             {
-                Model = settings.Model,
+                Model = model,
                 Temperature = settings.Temperature,
                 Stream = settings.UseStreaming,
                 Messages = messages
             }, _jsonOptions);
         }
 
-        private string SerializeOllamaRequest(AppSettings settings, List<AiMessage> messages)
+        private string SerializeOllamaRequest(AppSettings settings, List<AiMessage> messages, string model)
         {
             return JsonSerializer.Serialize(new OllamaChatRequest
             {
-                Model = settings.Model,
+                Model = model,
                 Stream = settings.UseStreaming,
                 Messages = messages
             }, _jsonOptions);

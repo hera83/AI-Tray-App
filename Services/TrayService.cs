@@ -203,8 +203,16 @@ namespace TrayApp.Services
 
         private static System.Drawing.Icon? TryLoadIcon(string path)
         {
-            try { return new System.Drawing.Icon(path); }
-            catch { return null; }
+            try
+            {
+                var targetSize = SystemInformation.SmallIconSize;
+                return new System.Drawing.Icon(path, targetSize);
+            }
+            catch
+            {
+                try { return new System.Drawing.Icon(path); }
+                catch { return null; }
+            }
         }
 
         public void Dispose()

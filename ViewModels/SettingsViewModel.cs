@@ -319,11 +319,25 @@ namespace TrayApp.ViewModels
         {
             try
             {
+                var normalizedModel = string.IsNullOrWhiteSpace(Model)
+                    ? _service.Settings.Model?.Trim()
+                    : Model.Trim();
+
+                if (string.IsNullOrWhiteSpace(normalizedModel))
+                {
+                    normalizedModel = AvailableModels
+                        .FirstOrDefault(modelName => !string.IsNullOrWhiteSpace(modelName))
+                        ?.Trim();
+                }
+
+                if (string.IsNullOrWhiteSpace(normalizedModel))
+                    normalizedModel = "gpt-4o-mini";
+
                 _service.Apply(new AppSettings
                 {
                     AiEndpoint              = AiEndpoint.Trim(),
                     ApiKey                  = ApiKey,
-                    Model                   = string.IsNullOrWhiteSpace(Model) ? string.Empty : Model.Trim(),
+                    Model                   = normalizedModel,
                     SystemPrompt            = SystemPrompt,
                     UserProfile             = UserAdditionalContext.Trim(),
                     UserFullName            = UserFullName.Trim(),

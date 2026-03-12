@@ -3,35 +3,35 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
   <!-- Font family -->
-  <FontFamily x:Key="FontFamily.Base">Segoe UI</FontFamily>
+  <FontFamily x:Key="FontFamily.Base">Segoe UI Variable Text, Segoe UI, Inter</FontFamily>
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <!-- FONT SIZE SCALE (Complete hierarchy for all UI levels) -->
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
 
   <!-- Display scale: Large, bold headings for hero content -->
-  <sys:Double x:Key="FontSize.Display.XL">28</sys:Double>  <!-- App titles, main headers -->
-  <sys:Double x:Key="FontSize.Display.Large">24</sys:Double> <!-- Page headers, modal titles -->
-  <sys:Double x:Key="FontSize.Display.Medium">20</sys:Double> <!-- Sidebar branding -->
+  <sys:Double x:Key="FontSize.Display.XL">30</sys:Double>  <!-- App titles, main headers -->
+  <sys:Double x:Key="FontSize.Display.Large">26</sys:Double> <!-- Page headers, modal titles -->
+  <sys:Double x:Key="FontSize.Display.Medium">22</sys:Double> <!-- Sidebar branding -->
 
   <!-- Heading scale: Section organization -->
-  <sys:Double x:Key="FontSize.Heading.1">18</sys:Double>  <!-- Main section headers -->
-  <sys:Double x:Key="FontSize.Heading.2">16</sys:Double>  <!-- Subsection headers -->
-  <sys:Double x:Key="FontSize.Heading.3">14</sys:Double>  <!-- Small section headers -->
+  <sys:Double x:Key="FontSize.Heading.1">20</sys:Double>  <!-- Main section headers -->
+  <sys:Double x:Key="FontSize.Heading.2">18</sys:Double>  <!-- Subsection headers -->
+  <sys:Double x:Key="FontSize.Heading.3">16</sys:Double>  <!-- Small section headers -->
 
   <!-- Body scale: Main content readability -->
-  <sys:Double x:Key="FontSize.Body.Large">14</sys:Double>  <!-- Emphasized content, important text -->
-  <sys:Double x:Key="FontSize.Body">13</sys:Double>       <!-- Default body text, chat messages -->
-  <sys:Double x:Key="FontSize.Body.Small">12</sys:Double> <!-- Secondary content, helper text -->
+  <sys:Double x:Key="FontSize.Body.Large">15</sys:Double>  <!-- Emphasized content, important text -->
+  <sys:Double x:Key="FontSize.Body">14</sys:Double>       <!-- Default body text, chat messages -->
+  <sys:Double x:Key="FontSize.Body.Small">13</sys:Double> <!-- Secondary content, helper text -->
 
   <!-- Caption scale: UI labels and metadata -->
-  <sys:Double x:Key="FontSize.Caption">11</sys:Double>    <!-- Field labels, timestamps, badges -->
-  <sys:Double x:Key="FontSize.Tiny">10</sys:Double>       <!-- Meta info, very small labels -->
+  <sys:Double x:Key="FontSize.Caption">12</sys:Double>    <!-- Field labels, timestamps, badges -->
+  <sys:Double x:Key="FontSize.Tiny">11</sys:Double>       <!-- Meta info, very small labels -->
 
   <!-- Legacy aliases for backwards compatibility -->
-  <sys:Double x:Key="FontSize.Display">20</sys:Double>
-  <sys:Double x:Key="FontSize.Heading">18</sys:Double>
-  <sys:Double x:Key="FontSize.Emphasis">14</sys:Double>
+  <sys:Double x:Key="FontSize.Display">22</sys:Double>
+  <sys:Double x:Key="FontSize.Heading">20</sys:Double>
+  <sys:Double x:Key="FontSize.Emphasis">15</sys:Double>
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <!-- FONT WEIGHT SCALE (Explicit weights for clarity) -->
@@ -45,10 +45,10 @@
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <!-- LINE HEIGHT SCALE (Vertical space within text) -->
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <sys:Double x:Key="LineHeight.Tight">20</sys:Double>   <!-- Headings, tight spacing (1.0x) -->
-  <sys:Double x:Key="LineHeight.Normal">22</sys:Double>  <!-- Body text, default (1.6x for 13px) -->
-  <sys:Double x:Key="LineHeight.Relaxed">26</sys:Double> <!-- Long form content, better readability -->
-  <sys:Double x:Key="LineHeight.Loose">30</sys:Double>   <!-- Chat messages, emphasis -->
+  <sys:Double x:Key="LineHeight.Tight">22</sys:Double>   <!-- Headings, tight spacing (1.0x) -->
+  <sys:Double x:Key="LineHeight.Normal">24</sys:Double>  <!-- Body text, default (1.6x for 14px) -->
+  <sys:Double x:Key="LineHeight.Relaxed">28</sys:Double> <!-- Long form content, better readability -->
+  <sys:Double x:Key="LineHeight.Loose">32</sys:Double>   <!-- Chat messages, emphasis -->
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <!-- LETTER SPACING SCALE (Horizontal spacing within text) -->
@@ -168,19 +168,19 @@
 
   <Style x:Key="SectionHeaderTextStyle" TargetType="TextBlock">
     <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
-    <Setter Property="FontSize" Value="{StaticResource FontSize.Caption}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Heading.3}" />
     <Setter Property="FontWeight" Value="{StaticResource FontWeight.SemiBold}" />
-    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextMuted}" />
-    <Setter Property="Margin" Value="0,14,0,8" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextSecondary}" />
+    <Setter Property="Margin" Value="0,18,0,10" />
     <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
   </Style>
 
   <Style x:Key="FieldLabelTextStyle" TargetType="TextBlock">
     <Setter Property="FontFamily" Value="{StaticResource FontFamily.Base}" />
-    <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSize.Body.Small}" />
     <Setter Property="FontWeight" Value="{StaticResource FontWeight.Medium}" />
     <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextSecondary}" />
-    <Setter Property="Margin" Value="0,0,0,6" />
+    <Setter Property="Margin" Value="0,0,0,8" />
     <Setter Property="LineHeight" Value="{StaticResource LineHeight.Tight}" />
   </Style>
 

@@ -7,17 +7,36 @@
         Width="{StaticResource Size.Window.Settings.Width}"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource Brush.Theme.WindowBackground}">
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
 
-    <Grid Margin="{StaticResource Thickness.Page.SettingsPadding}">
-        <Grid.RowDefinitions>
+    <Grid>
+        <Border Margin="0"
+                Background="{DynamicResource Brush.Theme.WindowBackground}"
+                BorderBrush="{DynamicResource Brush.Theme.Border}"
+                BorderThickness="1"
+            CornerRadius="{StaticResource CornerRadius.Large}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="12" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="Transparent"
+                        MouseLeftButtonDown="DragRegion_MouseLeftButtonDown" />
+
+                <Grid Grid.Row="1" Margin="{StaticResource Thickness.Page.SettingsPadding}">
+
+                    <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+                    </Grid.RowDefinitions>
 
         <TabControl Grid.Row="0" SelectedIndex="0">
             <TabItem Header="Bruger">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="2">
                     <StackPanel>
                         <TextBlock Text="Bruger" Style="{StaticResource SectionHeaderTextStyle}"/>
                         <Separator Style="{StaticResource PanelSeparatorStyle}"/>
@@ -68,7 +87,7 @@
             </TabItem>
 
             <TabItem Header="Config">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="2">
                     <StackPanel>
 
                         <!-- ══ AI Gateway ══ -->
@@ -100,7 +119,8 @@
 
                             <ComboBox Grid.Column="0"
                                       ItemsSource="{Binding AvailableModels}"
-                                      SelectedItem="{Binding Model, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                      SelectedItem="{Binding Model, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Text="{Binding Model, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                             <Button Grid.Column="1"
                                     Content="Opdater"
@@ -190,32 +210,44 @@
         </TabControl>
 
         <!-- Bottom bar -->
-        <Grid Grid.Row="1" Margin="{StaticResource Thickness.Layout.BottomBarTop}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <Border Grid.Row="1"
+                Margin="{StaticResource Thickness.Layout.BottomBarTop}"
+                CornerRadius="{StaticResource CornerRadius.Large}"
+                Background="{DynamicResource Brush.Theme.SurfaceBackground}"
+                BorderBrush="{DynamicResource Brush.Theme.Border}"
+                BorderThickness="1"
+                Padding="14,12"
+                Effect="{StaticResource Effect.Shadow.Card}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="{Binding StatusMessage}"
-                       VerticalAlignment="Center">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock" BasedOn="{StaticResource BodyStyle}">
-                        <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Feedback.Success}"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsStatusError}" Value="True">
-                                <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Feedback.Error}"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
+                <TextBlock Grid.Column="0" Text="{Binding StatusMessage}"
+                           VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource BodyStyle}">
+                            <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Feedback.Success}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsStatusError}" Value="True">
+                                    <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.Feedback.Error}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
 
-            <Button Grid.Column="1" Content="Annuller" Command="{Binding CancelCommand}"
-                    Width="{StaticResource Size.Button.DialogWidth}" Margin="{StaticResource Thickness.Margin.Right.8}" Style="{StaticResource SecondaryButtonStyle}"/>
+                <Button Grid.Column="1" Content="Annuller" Command="{Binding CancelCommand}"
+                        Width="{StaticResource Size.Button.DialogWidth}" Margin="{StaticResource Thickness.Margin.Right.8}" Style="{StaticResource SecondaryButtonStyle}"/>
 
-            <Button Grid.Column="2" Content="Gem" Command="{Binding SaveCommand}"
-                    Width="{StaticResource Size.Button.DialogWidth}" Style="{StaticResource PrimaryButtonStyle}"/>
-        </Grid>
+                <Button Grid.Column="2" Content="Gem" Command="{Binding SaveCommand}"
+                        Width="{StaticResource Size.Button.DialogWidth}" Style="{StaticResource PrimaryButtonStyle}"/>
+            </Grid>
+        </Border>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

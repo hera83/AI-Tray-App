@@ -4,9 +4,22 @@
 ![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)
 ![Platform](https://img.shields.io/badge/Platform-Windows-0078D6)
 
-This is a minimal native Windows WPF tray app scaffold (C#/.NET) with a Messenger-like chat UI and MVVM structure.
+Native Windows WPF tray-chat app (C#/.NET, MVVM) med moderne, minimal chat-UI, themes, modelvalg og lokal historik.
 
-Files created and responsibilities are explained in the repository and below.
+## Projektstatus (marts 2026)
+
+- Frameless hovedvindue med runde hjørner, transparent host og custom drag-områder.
+- Indstillingsvindue matcher hovedvinduets visuelle shell og interaction-pattern.
+- Chat med streaming-svar, markdown-rendering og typing-indikator i selve korrespondancen.
+- Modelhåndtering med global standardmodel i indstillinger + sessionsmodel i hovedvinduet.
+- Lokal persistence af settings/chat (SQLite) samt startup- og fejl-diagnostics i log.
+- Tray-first adfærd med notifications og hurtig adgang via system tray ikon.
+
+## Kørsel & udvikling
+
+- Build: `dotnet build TrayApp.csproj -c Debug -f net10.0-windows`
+- App icon/tray icon: `Assets/app.ico`
+- Logfil: `%APPDATA%/TrayApp/logs/trayapp.log`
 
 ## Design system og themes
 
@@ -20,7 +33,7 @@ Appen bruger nu et fælles designsystem med centraliserede XAML dictionaries:
 - `Resources/Typography.xaml` samler font- og teksttokens/stilarter.
 - `Styles/Controls.xaml` samler standard control styles (buttons, inputs, cards, separators, osv.).
 
-`App.xaml` peger aktuelt på `Themes/Theme.Dark.xaml`. For at skifte default theme, skift merged dictionary til `Themes/Theme.Light.xaml`.
+Theme vælges via gemte settings og anvendes ved startup gennem `ThemeManager`.
 
 ### Centrale theme keys
 
