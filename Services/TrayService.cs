@@ -24,7 +24,7 @@ namespace TrayApp.Services
         {
             _mainWindow = mainWindow;
             _notifyIcon = new NotifyIcon();
-            _notifyIcon.Text = "Tray AI Chat";
+            _notifyIcon.Text = "AI Assistent";
 
             // load custom icon; fall back to built-in application icon
             var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "app.ico");

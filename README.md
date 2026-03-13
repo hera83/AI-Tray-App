@@ -1,10 +1,10 @@
-# Tray AI Chat (WPF)
+# AI Assistent (WPF)
 
 [![Latest Release](https://img.shields.io/github/v/release/hera83/AI-Tray-App?display_name=tag)](https://github.com/hera83/AI-Tray-App/releases)
 ![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)
 ![Platform](https://img.shields.io/badge/Platform-Windows-0078D6)
 
-Native Windows WPF tray-chat app (C#/.NET, MVVM) med moderne, minimal chat-UI, themes, modelvalg og lokal historik.
+Native Windows WPF AI-assistent app (C#/.NET, MVVM) med moderne, minimal chat-UI, themes, modelvalg og lokal historik.
 
 ## Projektstatus (marts 2026)
 
@@ -19,7 +19,54 @@ Native Windows WPF tray-chat app (C#/.NET, MVVM) med moderne, minimal chat-UI, t
 
 - Build: `dotnet build TrayApp.csproj -c Debug -f net10.0-windows`
 - App icon/tray icon: `Assets/app.ico`
-- Logfil: `%APPDATA%/TrayApp/logs/trayapp.log`
+- Logfil: `%APPDATA%/AIAssistent/logs/ai-assistent.log`
+- Versionslog: `CHANGELOG.md`
+
+## Distribution (Windows installer)
+
+Projektet er sat op til Release publish (self-contained, `win-x64`) + Inno Setup installer.
+
+### 1) Build publish-output (Release)
+
+- Hurtig vej (script): `.\scripts\publish-win-x64.ps1`
+- Direkte CLI: `dotnet publish TrayApp.csproj -c Release -f net10.0-windows -p:PublishProfile=WinX64SelfContained`
+
+Output mappe:
+
+- `artifacts/publish/win-x64`
+
+### 2) Build installer (.exe)
+
+Forudsætning: Inno Setup 6 installeret (`ISCC.exe`).
+
+- Standard (kører publish + installer): `.\scripts\build-installer.ps1`
+- Kun installer fra eksisterende publish-output: `.\scripts\build-installer.ps1 -SkipPublish`
+- Overstyr version i installer: `.\scripts\build-installer.ps1 -AppVersion 1.2.3`
+- Forberedt til signering senere: `.\scripts\build-installer.ps1 -SignToolCmd 'signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /a $f'`
+- Direkte Inno Setup (uden script): `& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0 .\scripts\installer\TrayApp.iss`
+
+Hvis PowerShell blokerer `.ps1` scripts pga. Execution Policy, så kør midlertidigt i aktiv session:
+
+- `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+
+Installer-script:
+
+- `scripts/installer/TrayApp.iss`
+
+Installer output mappe:
+
+- `artifacts/installer`
+
+### Installer-funktioner
+
+- Bruger app-ikon som setup-ikon og uninstall-display-ikon
+- Sætter versionsinfo i setup metadata (`AppVersion`)
+- Understøtter installation både pr. bruger og for alle brugere (valg i installer)
+- Tilbyder "fresh local database" ved installation (rydder eksisterende `%APPDATA%/AIAssistent`)
+- Opretter Startmenu-genvej
+- Tilbyder valgfri skrivebordsgenvej (unchecked som standard)
+- Tilbyder valgfri autostart-genvej (unchecked som standard)
+- Understøtter uninstall via standard Windows uninstall og lukker kørende app ved install/uninstall
 
 ## Design system og themes
 

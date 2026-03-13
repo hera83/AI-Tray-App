@@ -10,14 +10,15 @@ namespace TrayApp.Infrastructure
     public static class StartupManager
     {
         private const string RegistryKey  = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
-        private const string AppName      = "TrayAIChat";
+        private const string AppName      = "AIAssistent";
+        private const string LegacyAppName = "TrayAIChat";
 
         public static bool IsEnabled()
         {
             try
             {
                 using var key = Registry.CurrentUser.OpenSubKey(RegistryKey, writable: false);
-                return key?.GetValue(AppName) != null;
+                return key?.GetValue(AppName) != null || key?.GetValue(LegacyAppName) != null;
             }
             catch { return false; }
         }
@@ -31,6 +32,8 @@ namespace TrayApp.Infrastructure
 
                 using var key = Registry.CurrentUser.OpenSubKey(RegistryKey, writable: true);
                 key?.SetValue(AppName, $"\"{exePath}\"");
+                if (key?.GetValue(LegacyAppName) != null)
+                    key.DeleteValue(LegacyAppName);
             }
             catch { /* silently ignore in non-Windows environments */ }
         }
@@ -42,6 +45,8 @@ namespace TrayApp.Infrastructure
                 using var key = Registry.CurrentUser.OpenSubKey(RegistryKey, writable: true);
                 if (key?.GetValue(AppName) != null)
                     key.DeleteValue(AppName);
+                if (key?.GetValue(LegacyAppName) != null)
+                    key.DeleteValue(LegacyAppName);
             }
             catch { }
         }

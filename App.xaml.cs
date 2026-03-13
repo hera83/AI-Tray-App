@@ -34,15 +34,15 @@ namespace TrayApp
             try
             {
                 var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                var baseDir = Path.Combine(appData, "TrayApp");
+                var baseDir = Path.Combine(appData, "AIAssistent");
                 Directory.CreateDirectory(baseDir);
 
-                _logger = new FileAppLogger(Path.Combine(baseDir, "logs", "trayapp.log"));
+                _logger = new FileAppLogger(Path.Combine(baseDir, "logs", "ai-assistent.log"));
                 RegisterGlobalExceptionHandlers();
                 _logger.LogInfo($"{AppInfo.ProductName} {AppInfo.Version} starter.");
                 LogStartupDiagnostics("Startup.Begin");
 
-                var db = new AppDatabase(Path.Combine(baseDir, "trayapp.db"));
+                var db = new AppDatabase(Path.Combine(baseDir, "ai-assistent.db"));
                 ISettingsService settingsService = new SettingsService(db);
                 _themeManager = new ThemeManager(this);
                 _logger.LogInfo($"Anvender theme-mode fra settings: {settingsService.Settings.ThemeMode}");
@@ -117,7 +117,7 @@ namespace TrayApp
                 LogStartupDiagnostics("Startup.FatalCatch");
                 _logger?.LogError("Fatal fejl under startup.", ex);
                 System.Windows.MessageBox.Show(
-                    "Appen kunne ikke starte korrekt. Se logfilen i AppData/TrayApp/logs for detaljer.",
+                    "Appen kunne ikke starte korrekt. Se logfilen i AppData/AIAssistent/logs for detaljer.",
                     AppInfo.ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
