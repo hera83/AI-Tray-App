@@ -68,6 +68,7 @@ namespace TrayApp.Converters
         private static FlowDocument CreateDocument(string? markdown, MessageRole role)
         {
             var foreground = ResolveRoleForeground(role);
+            var pageWidth = ResolveMessagePageWidth(markdown);
             var doc = new FlowDocument
             {
                 PagePadding = new Thickness(0),
@@ -75,7 +76,11 @@ namespace TrayApp.Converters
                 FontSize = ResolveDouble("FontSize.Body", 16),
                 LineHeight = 22,
                 Foreground = foreground,
-                Background = WpfBrushes.Transparent
+                Background = WpfBrushes.Transparent,
+                PageWidth = pageWidth,
+                MinPageWidth = 0,
+                MaxPageWidth = pageWidth,
+                ColumnWidth = pageWidth
             };
 
             if (string.IsNullOrWhiteSpace(markdown))
@@ -95,6 +100,51 @@ namespace TrayApp.Converters
                 doc.Blocks.Add(CreateFallbackParagraph(markdown, role));
 
             return doc;
+        }
+
+        private static double ResolveMessagePageWidth(string? markdown)
+        {
+            const double minPageWidth = 24;
+            const double viewerChromeWidth = 18;
+
+            var maxBubbleWidth = ResolveDouble("Size.ChatBubble.MaxWidth.Narrow", 490);
+            var bubblePadding = ResolveThickness("Thickness.Chat.BubblePadding", new Thickness(16, 14, 16, 14));
+            var maxPageWidth = Math.Max(minPageWidth, maxBubbleWidth - bubblePadding.Left - bubblePadding.Right - viewerChromeWidth);
+
+            if (string.IsNullOrWhiteSpace(markdown))
+                return minPageWidth;
+
+            var fontSize = ResolveDouble("FontSize.Body", 16);
+            var pixelsPerDip = ResolvePixelsPerDip();
+            var typeface = new Typeface(
+                new WpfFontFamily("Segoe UI"),
+                FontStyles.Normal,
+                FontWeights.Normal,
+                FontStretches.Normal);
+
+            var widestLine = 0d;
+            var lines = markdown.Replace("\r\n", "\n").Split('\n');
+
+            foreach (var line in lines)
+            {
+                var candidate = string.IsNullOrEmpty(line) ? " " : line;
+                var formattedText = new FormattedText(
+                    candidate,
+                    CultureInfo.CurrentUICulture,
+                    System.Windows.FlowDirection.LeftToRight,
+                    typeface,
+                    fontSize,
+                    WpfBrushes.Black,
+                    pixelsPerDip)
+                {
+                    MaxTextWidth = maxPageWidth
+                };
+
+                widestLine = Math.Max(widestLine, formattedText.WidthIncludingTrailingWhitespace);
+            }
+
+            var measuredWidth = Math.Ceiling(widestLine + 2);
+            return Math.Clamp(measuredWidth, minPageWidth, maxPageWidth);
         }
 
         private static void AppendBlocks(BlockCollection target, ContainerBlock container, MessageRole role)
@@ -426,6 +476,23 @@ namespace TrayApp.Converters
                 return value;
 
             return fallback;
+        }
+
+        private static Thickness ResolveThickness(string resourceKey, Thickness fallback)
+        {
+            if (WpfApplication.Current?.TryFindResource(resourceKey) is Thickness value)
+                return value;
+
+            return fallback;
+        }
+
+        private static double ResolvePixelsPerDip()
+        {
+            var mainWindow = WpfApplication.Current?.MainWindow;
+            if (mainWindow == null)
+                return 1;
+
+            return VisualTreeHelper.GetDpi(mainWindow).PixelsPerDip;
         }
 
         private static void OpenUri(Uri uri)

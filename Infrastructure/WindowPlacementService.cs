@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Media;
 
 namespace TrayApp.Infrastructure
 {
@@ -16,9 +17,9 @@ namespace TrayApp.Infrastructure
 
         private record PlacementRecord(double Left, double Top, double Width, double Height, string State);
 
-        private const double MinDimension  = 200;
+        private const double MinDimension = 200;
         private const double DefaultRightMargin = 20;
-    private const double DefaultBottomMargin = 20;
+        private const double DefaultBottomMargin = 20;
 
         public WindowPlacementService(string path) => _path = path;
 
@@ -84,19 +85,36 @@ namespace TrayApp.Infrastructure
             if (double.IsNaN(window.Height) || window.Height < MinDimension)
                 window.Height = MinDimension * 2;
 
-            var screen = Screen.FromPoint(Control.MousePosition);
-            var workArea = screen.WorkingArea;
+            var workArea = GetWorkAreaInDip(window);
+            var maxLeft = Math.Max(workArea.Left, workArea.Right - window.Width);
+            var maxTop = Math.Max(workArea.Top, workArea.Bottom - window.Height);
             var x = workArea.Right - window.Width - DefaultRightMargin;
             var y = workArea.Bottom - window.Height - DefaultBottomMargin;
 
-            x = Math.Max(workArea.Left, Math.Min(x, workArea.Right - window.Width));
-            y = Math.Max(workArea.Top, Math.Min(y, workArea.Bottom - window.Height));
+            x = Math.Clamp(x, workArea.Left, maxLeft);
+            y = Math.Clamp(y, workArea.Top, maxTop);
 
             window.Left = x;
             window.Top = y;
 
             window.WindowStartupLocation = WindowStartupLocation.Manual;
             window.WindowState = WindowState.Normal;
+        }
+
+        private static Rect GetWorkAreaInDip(Window window)
+        {
+            var screen = Screen.FromPoint(Control.MousePosition);
+            var workAreaPx = screen.WorkingArea;
+
+            var dpi = VisualTreeHelper.GetDpi(window);
+            var pxToDipX = dpi.DpiScaleX > 0 ? 1d / dpi.DpiScaleX : 1d;
+            var pxToDipY = dpi.DpiScaleY > 0 ? 1d / dpi.DpiScaleY : 1d;
+
+            return new Rect(
+                workAreaPx.Left * pxToDipX,
+                workAreaPx.Top * pxToDipY,
+                workAreaPx.Width * pxToDipX,
+                workAreaPx.Height * pxToDipY);
         }
     }
 }

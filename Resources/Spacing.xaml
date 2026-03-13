@@ -32,7 +32,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
 
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.ChatBubble.MaxWidth">680</sys:Double>
-  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.ChatBubble.MaxWidth.Narrow">340</sys:Double>
+  <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.ChatBubble.MaxWidth.Narrow">490</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.MessageLane.MaxWidth">700</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.EmptyState.Width">420</sys:Double>
   <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="Size.Chat.FloatingButton.Width">170</sys:Double>

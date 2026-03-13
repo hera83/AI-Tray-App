@@ -66,6 +66,7 @@
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="IsToolBarVisible" Value="False" />
     <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
     <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />

@@ -16,6 +16,7 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter" />
         <converters:MarkdownMessageToFlowDocumentConverter x:Key="MarkdownMessageToFlowDocumentConverter" />
+        <converters:MultiplyDoubleConverter x:Key="MultiplyDoubleConverter" />
 
         <Style x:Key="SidebarConversationItemStyle" TargetType="ListBoxItem">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Theme.TextPrimary}" />
@@ -152,10 +153,23 @@
         </Style>
 
         <DataTemplate x:Key="ChatMessageTemplate">
-            <Grid x:Name="MessageRow" Margin="{StaticResource Thickness.Chat.Row.Left}">
-                <StackPanel>
-                    <Border x:Name="MessageBubble" Style="{StaticResource ChatAssistantBubbleStyle}" Margin="{StaticResource Thickness.Chat.Bubble.Left}">
-                        <StackPanel>
+            <Grid x:Name="MessageRow"
+                  Margin="{StaticResource Thickness.Chat.Row.Left}"
+                  HorizontalAlignment="Stretch">
+                <StackPanel x:Name="MessageContent"
+                            HorizontalAlignment="Left">
+                    <Border x:Name="MessageBubble"
+                            Style="{StaticResource ChatAssistantBubbleStyle}"
+                            Margin="{StaticResource Thickness.Chat.Bubble.Left}"
+                            MinWidth="0"
+                            Width="Auto">
+                        <Border.MaxWidth>
+                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}"
+                                     Path="ActualWidth"
+                                     Converter="{StaticResource MultiplyDoubleConverter}"
+                                     ConverterParameter="0.7" />
+                        </Border.MaxWidth>
+                        <StackPanel HorizontalAlignment="Left">
                             <FlowDocumentScrollViewer x:Name="MessageMarkdown"
                                                       Style="{StaticResource ChatMarkdownViewerStyle}"
                                                       Visibility="{Binding Content, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
@@ -215,6 +229,7 @@
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding Role}" Value="User">
                     <Setter TargetName="MessageRow" Property="Margin" Value="{StaticResource Thickness.Chat.Row.Right}" />
+                    <Setter TargetName="MessageContent" Property="HorizontalAlignment" Value="Right" />
                     <Setter TargetName="MessageBubble" Property="Style" Value="{StaticResource ChatUserBubbleStyle}" />
                     <Setter TargetName="MessageBubble" Property="HorizontalAlignment" Value="Right" />
                     <Setter TargetName="MessageTimestamp" Property="HorizontalAlignment" Value="Right" />
@@ -419,7 +434,13 @@
                                   MaxWidth="{StaticResource Size.Chat.MessageLane.MaxWidth}"
                                   Margin="0,2,0,4">
                                 <ItemsControl ItemsSource="{Binding Messages}"
-                                              ItemTemplate="{StaticResource ChatMessageTemplate}" />
+                                              ItemTemplate="{StaticResource ChatMessageTemplate}">
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                </ItemsControl>
                             </Grid>
                         </ScrollViewer>
                     </Border>
