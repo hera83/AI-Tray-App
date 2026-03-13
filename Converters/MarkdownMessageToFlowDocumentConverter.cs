@@ -32,12 +32,12 @@ namespace TrayApp.Converters
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is ChatMessage message)
-                return CreateDocument(message.Content, message.Role);
+                return CreateDocument(message.Content, message.Role, double.NaN);
 
             if (value is string markdown)
-                return CreateDocument(markdown, MessageRole.Assistant);
+                return CreateDocument(markdown, MessageRole.Assistant, double.NaN);
 
-            return CreateDocument(string.Empty, MessageRole.Assistant);
+            return CreateDocument(string.Empty, MessageRole.Assistant, double.NaN);
         }
 
         public object Convert(object[] values, Type targetType, object? parameter, CultureInfo culture)
@@ -48,11 +48,14 @@ namespace TrayApp.Converters
                 var role = values.Length > 1 && values[1] is MessageRole messageRole
                     ? messageRole
                     : MessageRole.Assistant;
+                var maxBubbleWidth = values.Length > 2 && values[2] is double resolvedMaxBubbleWidth
+                    ? resolvedMaxBubbleWidth
+                    : double.NaN;
 
-                return CreateDocument(content, role);
+                return CreateDocument(content, role, maxBubbleWidth);
             }
 
-            return CreateDocument(string.Empty, MessageRole.Assistant);
+            return CreateDocument(string.Empty, MessageRole.Assistant, double.NaN);
         }
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -65,10 +68,10 @@ namespace TrayApp.Converters
             return Array.Empty<object>();
         }
 
-        private static FlowDocument CreateDocument(string? markdown, MessageRole role)
+        private static FlowDocument CreateDocument(string? markdown, MessageRole role, double maxBubbleWidth)
         {
             var foreground = ResolveRoleForeground(role);
-            var pageWidth = ResolveMessagePageWidth(markdown);
+            var pageWidth = ResolveMessagePageWidth(markdown, maxBubbleWidth);
             var doc = new FlowDocument
             {
                 PagePadding = new Thickness(0),
@@ -102,14 +105,23 @@ namespace TrayApp.Converters
             return doc;
         }
 
-        private static double ResolveMessagePageWidth(string? markdown)
+        private static double ResolveMessagePageWidth(string? markdown, double maxBubbleWidth)
         {
             const double minPageWidth = 24;
-            const double viewerChromeWidth = 18;
+            const double bubbleBorderWidth = 2;
+            const double viewerChromeWidth = 22;
+            const double safetyInsetWidth = 6;
 
-            var maxBubbleWidth = ResolveDouble("Size.ChatBubble.MaxWidth.Narrow", 490);
+            var resolvedBubbleMaxWidth = ResolveBubbleMaxWidth(maxBubbleWidth);
             var bubblePadding = ResolveThickness("Thickness.Chat.BubblePadding", new Thickness(16, 14, 16, 14));
-            var maxPageWidth = Math.Max(minPageWidth, maxBubbleWidth - bubblePadding.Left - bubblePadding.Right - viewerChromeWidth);
+            var maxPageWidth = Math.Max(
+                minPageWidth,
+                resolvedBubbleMaxWidth
+                - bubblePadding.Left
+                - bubblePadding.Right
+                - bubbleBorderWidth
+                - viewerChromeWidth
+                - safetyInsetWidth);
 
             if (string.IsNullOrWhiteSpace(markdown))
                 return minPageWidth;
@@ -145,6 +157,14 @@ namespace TrayApp.Converters
 
             var measuredWidth = Math.Ceiling(widestLine + 2);
             return Math.Clamp(measuredWidth, minPageWidth, maxPageWidth);
+        }
+
+        private static double ResolveBubbleMaxWidth(double maxBubbleWidth)
+        {
+            if (double.IsFinite(maxBubbleWidth) && maxBubbleWidth > 0)
+                return maxBubbleWidth;
+
+            return ResolveDouble("Size.ChatBubble.MaxWidth.Narrow", 490);
         }
 
         private static void AppendBlocks(BlockCollection target, ContainerBlock container, MessageRole role)

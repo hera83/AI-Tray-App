@@ -155,10 +155,16 @@
         <DataTemplate x:Key="ChatMessageTemplate">
             <Grid x:Name="MessageRow"
                   Margin="{StaticResource Thickness.Chat.Row.Left}"
-                  HorizontalAlignment="Stretch">
-                <StackPanel x:Name="MessageContent"
-                            HorizontalAlignment="Left">
+                HorizontalAlignment="Stretch">
+                <Grid x:Name="MessageContent"
+                      HorizontalAlignment="Left">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
                     <Border x:Name="MessageBubble"
+                            Grid.Row="0"
                             Style="{StaticResource ChatAssistantBubbleStyle}"
                             Margin="{StaticResource Thickness.Chat.Bubble.Left}"
                             MinWidth="0"
@@ -167,7 +173,7 @@
                             <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}"
                                      Path="ActualWidth"
                                      Converter="{StaticResource MultiplyDoubleConverter}"
-                                     ConverterParameter="0.7" />
+                                     ConverterParameter="0.8" />
                         </Border.MaxWidth>
                         <StackPanel HorizontalAlignment="Left">
                             <FlowDocumentScrollViewer x:Name="MessageMarkdown"
@@ -177,6 +183,7 @@
                                     <MultiBinding Converter="{StaticResource MarkdownMessageToFlowDocumentConverter}">
                                         <Binding Path="Content" />
                                         <Binding Path="Role" />
+                                        <Binding ElementName="MessageBubble" Path="MaxWidth" />
                                     </MultiBinding>
                                 </FlowDocumentScrollViewer.Document>
                             </FlowDocumentScrollViewer>
@@ -220,17 +227,19 @@
                     </Border>
 
                     <TextBlock x:Name="MessageTimestamp"
+                               Grid.Row="1"
                                Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy · HH:mm}'}"
                                Style="{StaticResource ChatTimestampTextStyle}"
                                Margin="{StaticResource Thickness.Chat.Timestamp}"
                                HorizontalAlignment="Left" />
-                </StackPanel>
+                </Grid>
             </Grid>
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding Role}" Value="User">
                     <Setter TargetName="MessageRow" Property="Margin" Value="{StaticResource Thickness.Chat.Row.Right}" />
                     <Setter TargetName="MessageContent" Property="HorizontalAlignment" Value="Right" />
                     <Setter TargetName="MessageBubble" Property="Style" Value="{StaticResource ChatUserBubbleStyle}" />
+                    <Setter TargetName="MessageBubble" Property="Margin" Value="{StaticResource Thickness.Chat.Bubble.Right}" />
                     <Setter TargetName="MessageBubble" Property="HorizontalAlignment" Value="Right" />
                     <Setter TargetName="MessageTimestamp" Property="HorizontalAlignment" Value="Right" />
                 </DataTrigger>
@@ -424,6 +433,7 @@
                         <ScrollViewer x:Name="MessagesScroll"
                                       Grid.Row="0"
                                       VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
                                       Background="Transparent"
                                       CanContentScroll="False"
                                       PanningMode="VerticalOnly"
@@ -431,13 +441,22 @@
                                       behaviors:ScrollViewerBehavior.IsNearBottom="{Binding IsUserNearBottom, Mode=TwoWay}"
                                       behaviors:ScrollViewerBehavior.ScrollToBottomTrigger="{Binding ScrollToBottomRequest}">
                             <Grid HorizontalAlignment="Center"
+                                  Width="{Binding RelativeSource={RelativeSource AncestorType=ScrollViewer}, Path=ViewportWidth}"
                                   MaxWidth="{StaticResource Size.Chat.MessageLane.MaxWidth}"
                                   Margin="0,2,0,4">
                                 <ItemsControl ItemsSource="{Binding Messages}"
-                                              ItemTemplate="{StaticResource ChatMessageTemplate}">
+                                              ItemTemplate="{StaticResource ChatMessageTemplate}"
+                                              HorizontalAlignment="Stretch">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel HorizontalAlignment="Stretch" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemContainerStyle>
                                         <Style TargetType="ContentPresenter">
                                             <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                            <Setter Property="Width"
+                                                    Value="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, Path=ActualWidth}" />
                                         </Style>
                                     </ItemsControl.ItemContainerStyle>
                                 </ItemsControl>

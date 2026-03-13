@@ -36,6 +36,8 @@
     <Setter Property="MaxWidth" Value="{StaticResource Size.ChatBubble.MaxWidth.Narrow}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="BorderBrush" Value="{DynamicResource Brush.Theme.Border}" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="UseLayoutRounding" Value="True" />
   </Style>
 
   <Style x:Key="ChatAssistantBubbleStyle" TargetType="Border" BasedOn="{StaticResource ChatMessageBubbleBaseStyle}">
@@ -66,11 +68,15 @@
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="MinWidth" Value="0" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="IsToolBarVisible" Value="False" />
     <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
     <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
     <Setter Property="Focusable" Value="False" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="UseLayoutRounding" Value="True" />
   </Style>
 
   <Style x:Key="ChatRoleBadgeStyle" TargetType="Border">
