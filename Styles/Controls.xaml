@@ -471,11 +471,19 @@
                   <ColumnDefinition Width="{StaticResource GridLength.Control.DropdownAffordanceWidth}" />
                 </Grid.ColumnDefinitions>
 
+                <ToggleButton Grid.Column="0"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              Focusable="False"
+                              ClickMode="Press"
+                              IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+
                 <TextBlock Margin="12,8,8,8"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Left"
                            Foreground="{TemplateBinding Foreground}"
                            Text="{TemplateBinding Text}"
+                           IsHitTestVisible="False"
                            TextTrimming="CharacterEllipsis" />
 
                 <Border Grid.Column="1"

@@ -30,7 +30,7 @@ if ([string]::IsNullOrWhiteSpace($resolvedAppVersion)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($resolvedAppVersion)) {
-    $resolvedAppVersion = "1.0.0"
+    $resolvedAppVersion = "1.1.0"
 }
 
 $isccCandidates = @()
@@ -50,7 +50,19 @@ if (-not $isccPath) {
 }
 
 Write-Host "Building installer with Inno Setup..." -ForegroundColor Cyan
+New-Item -ItemType Directory -Force -Path $installerOutputDir | Out-Null
+
+$outputBaseFilename = "AI Assistent-Setup-$resolvedAppVersion"
+$stagingOutputDir = Join-Path $env:TEMP ("AI-Assistent-Installer-Staging-" + [Guid]::NewGuid().ToString("N"))
+New-Item -ItemType Directory -Force -Path $stagingOutputDir | Out-Null
+
+$stagedInstaller = Join-Path $stagingOutputDir "$outputBaseFilename.exe"
+$finalInstaller = Join-Path $installerOutputDir "$outputBaseFilename.exe"
+
 $isccArgs = @(
+    "/Qp",
+    "/O$stagingOutputDir",
+    "/F$outputBaseFilename",
     "/DAppVersion=$resolvedAppVersion"
 )
 
@@ -65,4 +77,16 @@ if ($LASTEXITCODE -ne 0) {
     throw "Installer build failed."
 }
 
-Write-Host "Installer output ready: $installerOutputDir" -ForegroundColor Green
+if (-not (Test-Path $stagedInstaller)) {
+    throw "Installer output not found at '$stagedInstaller'."
+}
+
+if (Test-Path $finalInstaller) {
+    Remove-Item -LiteralPath $finalInstaller -Force
+}
+
+Copy-Item -LiteralPath $stagedInstaller -Destination $finalInstaller -Force
+Remove-Item -LiteralPath $stagedInstaller -Force
+Remove-Item -LiteralPath $stagingOutputDir -Force
+
+Write-Host "Installer output ready: $finalInstaller" -ForegroundColor Green

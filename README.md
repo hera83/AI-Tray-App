@@ -62,7 +62,7 @@ Installer output mappe:
 - Bruger app-ikon som setup-ikon og uninstall-display-ikon
 - Sætter versionsinfo i setup metadata (`AppVersion`)
 - Understøtter installation både pr. bruger og for alle brugere (valg i installer)
-- Tilbyder "fresh local database" ved installation (rydder eksisterende `%APPDATA%/AIAssistent`)
+- Bevarer eksisterende brugerdata i `%APPDATA%/AIAssistent` ved installation og opgradering
 - Opretter Startmenu-genvej
 - Tilbyder valgfri skrivebordsgenvej (unchecked som standard)
 - Tilbyder valgfri autostart-genvej (unchecked som standard)

@@ -3,7 +3,7 @@
 #endif
 
 #ifndef AppVersion
-  #define AppVersion "1.0.0"
+  #define AppVersion "1.1.0"
 #endif
 
 #ifndef SignToolCmd
@@ -63,13 +63,9 @@ Name: "danish"; MessagesFile: "compiler:Languages\Danish.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "autostart"; Description: "Start {#AppName} when Windows starts"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "resetuserdata"; Description: "Start with a fresh local database (remove existing local app data)"; GroupDescription: "Installation options"
 
 [Files]
 Source: "{#PublishDir}*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.db,*.db-wal,*.db-shm,*.sqlite,*.sqlite3,*.log"
-
-[InstallDelete]
-Type: filesandordirs; Name: "{userappdata}\AIAssistent"; Tasks: resetuserdata
 
 [Icons]
 Name: "{autoprograms}\{#AppName}\{#AppName}"; Filename: "{app}\{#AppExeName}"

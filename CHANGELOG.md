@@ -8,6 +8,15 @@ Formatet følger løst principperne fra Keep a Changelog og Semantic Versioning.
 
 - Ingen ændringer endnu.
 
+## [1.1.0] - 2026-03-13
+
+### Changed
+
+- VS Code launch-konfiguration peger nu på den korrekte `AIAssistent.dll` outputfil.
+- Autostart holdes nu i sync mellem installerens Startup-genvej og appens egen Windows-opstart-indstilling.
+- Installer bevarer altid eksisterende brugerdata ved installation og opgradering.
+- Alle appens dropdowns åbner nu ved klik på hele feltet, ikke kun på pilen.
+
 ## [1.0.0] - 2026-03-13
 
 ### Added
